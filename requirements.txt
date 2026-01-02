@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+pyyaml
+numpy
+pytest
+requests
+httpx<0.28

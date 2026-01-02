@@ -1,0 +1,47 @@
+# =============================================================================
+# Logis AI Candidate Engine - Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Decision Thresholds (Scoring Cutoffs)
+# -----------------------------------------------------------------------------
+decision_thresholds:
+  strong_match: 85        # Score >= 85: Excellent match, high priority
+  potential_match: 60     # Score 60-84: Good match, review recommended
+  weak_match: 40          # Score 40-59: Borderline, low priority
+  # Score < 40: Not recommended
+
+# -----------------------------------------------------------------------------
+# Scoring Weights (Must sum to 1.0)
+# -----------------------------------------------------------------------------
+scoring_weights:
+  skills: 0.4             # 40% weight on skills match
+  experience: 0.2         # 20% weight on experience fit
+  semantic: 0.4           # 40% weight on semantic similarity
+
+# -----------------------------------------------------------------------------
+# Hard Rejection Rules Configuration
+# -----------------------------------------------------------------------------
+hard_rejection_rules:
+  salary_tolerance_percent: 10      # Allow 10% over max salary
+  max_experience_tolerance_years: 3  # Allow 3 years over max experience
+  visa_expiry_warning_days: 90       # Reject if visa expires within 90 days
+  
+  # Enable/disable specific rules (true = enabled)
+  enable_location_check: true
+  enable_visa_check: true
+  enable_salary_check: true
+  enable_min_experience_check: true
+  enable_max_experience_check: true
+  enable_nationality_check: true
+  enable_education_check: true
+  enable_gcc_experience_check: true
+
+# -----------------------------------------------------------------------------
+# Feature Flags
+# -----------------------------------------------------------------------------
+features:
+  use_enhanced_rejection_messages: true
+  generate_improvement_tips: true
+  generate_recruiter_summaries: true
+  enable_detailed_section_scores: true

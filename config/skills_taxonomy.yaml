@@ -1,0 +1,645 @@
+# Skills Taxonomy and Synonym Mapping - ENHANCED
+# This file defines skill synonyms, categories, and hierarchies for intelligent skill matching
+# Used by SkillMatcher for advanced candidate-job skill matching
+# Version: 2.0 (Enhanced Logistics Taxonomy)
+
+# =============================================================================
+# SKILL SYNONYMS - Handle common variations and abbreviations
+# =============================================================================
+synonyms:
+  # Programming Languages
+  javascript:
+    - js
+    - javascript
+    - ecmascript
+    - es6
+    - es2015
+    - node
+    - nodejs
+    - node.js
+  
+  python:
+    - python
+    - py
+    - python3
+    - python2
+  
+  typescript:
+    - ts
+    - typescript
+  
+  csharp:
+    - c#
+    - csharp
+    - c-sharp
+    - dotnet
+    - .net
+  
+  cplusplus:
+    - c++
+    - cpp
+    - cplusplus
+  
+  java:
+    - java
+    - jdk
+    - java se
+    - java ee
+  
+  golang:
+    - go
+    - golang
+  
+  ruby:
+    - ruby
+    - rails
+    - ruby on rails
+  
+  php:
+    - php
+    - php7
+    - php8
+  
+  # Frameworks & Libraries
+  react:
+    - react
+    - reactjs
+    - react.js
+    - react native
+  
+  angular:
+    - angular
+    - angularjs
+    - angular.js
+    - angular2
+    - ng
+  
+  vue:
+    - vue
+    - vuejs
+    - vue.js
+    - vue3
+  
+  django:
+    - django
+    - django framework
+  
+  flask:
+    - flask
+    - flask framework
+  
+  fastapi:
+    - fastapi
+    - fast api
+  
+  spring:
+    - spring
+    - spring boot
+    - springboot
+    - spring framework
+  
+  express:
+    - express
+    - expressjs
+    - express.js
+  
+  # Machine Learning & AI
+  machine_learning:
+    - ml
+    - machine learning
+    - machine-learning
+    - ai/ml
+  
+  deep_learning:
+    - dl
+    - deep learning
+    - deep-learning
+    - neural networks
+  
+  tensorflow:
+    - tensorflow
+    - tf
+    - tensor flow
+  
+  pytorch:
+    - pytorch
+    - torch
+    - py torch
+  
+  keras:
+    - keras
+  
+  scikit_learn:
+    - sklearn
+    - scikit-learn
+    - scikit learn
+    - sci-kit learn
+  
+  natural_language_processing:
+    - nlp
+    - natural language processing
+    - text mining
+    - text analytics
+  
+  computer_vision:
+    - cv
+    - computer vision
+    - image processing
+    - image recognition
+  
+  # Data & Analytics
+  sql:
+    - sql
+    - structured query language
+    - tsql
+    - t-sql
+    - plsql
+    - pl/sql
+  
+  nosql:
+    - nosql
+    - no-sql
+    - non-relational
+  
+  data_analysis:
+    - data analysis
+    - data analytics
+    - analytics
+    - data science
+  
+  data_engineering:
+    - data engineering
+    - etl
+    - data pipeline
+    - data pipelines
+  
+  big_data:
+    - big data
+    - hadoop
+    - spark
+    - apache spark
+  
+  # Cloud & DevOps
+  aws:
+    - aws
+    - amazon web services
+    - amazon aws
+  
+  azure:
+    - azure
+    - microsoft azure
+    - ms azure
+  
+  gcp:
+    - gcp
+    - google cloud
+    - google cloud platform
+  
+  docker:
+    - docker
+    - containerization
+    - containers
+  
+  kubernetes:
+    - kubernetes
+    - k8s
+    - kube
+  
+  ci_cd:
+    - ci/cd
+    - cicd
+    - ci-cd
+    - continuous integration
+    - continuous deployment
+    - jenkins
+    - github actions
+    - gitlab ci
+  
+  terraform:
+    - terraform
+    - tf
+    - infrastructure as code
+    - iac
+  
+  # Databases
+  postgresql:
+    - postgresql
+    - postgres
+    - psql
+  
+  mysql:
+    - mysql
+    - my sql
+  
+  mongodb:
+    - mongodb
+    - mongo
+    - mongo db
+  
+  redis:
+    - redis
+    - cache
+    - in-memory database
+  
+  elasticsearch:
+    - elasticsearch
+    - elastic search
+    - es
+    - elk
+  
+  # ===========================================================
+  # ENHANCED LOGISTICS & SUPPLY CHAIN TAXONOMY
+  # ===========================================================
+  warehouse_management:
+    - wms
+    - warehouse management
+    - warehouse management system
+    - inventory management
+    - inbound logistics
+    - outbound logistics
+  
+  transportation_management:
+    - tms
+    - transportation management
+    - fleet management
+    - logistics
+    - shipping
+    - distribution
+  
+  supply_chain_management:
+    - scm
+    - supply chain
+    - supply chain management
+    - supply chain operations
+  
+  erp:
+    - erp
+    - enterprise resource planning
+    - sap
+    - oracle erp
+    - sap s/4hana
+    - oracle netsuite
+  
+  demand_planning:
+    - demand planning
+    - forecasting
+    - demand forecasting
+  
+  procurement:
+    - procurement
+    - sourcing
+    - purchasing
+    - strategic sourcing
+    - vendor management
+  
+  inventory_optimization:
+    - inventory optimization
+    - stock management
+    - inventory control
+    - stock optimization
+  
+  logistics_planning:
+    - logistics planning
+    - network design
+    - logistics coordination
+  
+  freight_forwarding:
+    - freight forwarding
+    - freight management
+    - cargo management
+  
+  customs_clearance:
+    - customs clearance
+    - customs brokerage
+    - import compliance
+    - export compliance
+  
+  last_mile_delivery:
+    - last mile delivery
+    - final mile logistics
+  
+  reverse_logistics:
+    - reverse logistics
+    - returns management
+  
+  supply_chain_analytics:
+    - supply chain analytics
+    - logistics data analysis
+  
+  six_sigma:
+    - six sigma
+    - lean six sigma
+    - lss
+    - process improvement
+    - lean manufacturing
+  
+  # Specific ERP/SCM Software
+  sap_mm:
+    - sap mm
+    - sap materials management
+  
+  sap_sd:
+    - sap sd
+    - sap sales and distribution
+  
+  sap_ewm:
+    - sap ewm
+    - sap extended warehouse management
+  
+  oracle_scm:
+    - oracle scm
+    - oracle fusion scm
+    - oracle supply chain
+  
+  manhattan_wms:
+    - manhattan wms
+    - manhattan associates
+  
+  blue_yonder:
+    - blue yonder
+    - jda
+  
+  # Soft Skills
+  communication:
+    - communication
+    - verbal communication
+    - written communication
+    - presentation skills
+  
+  leadership:
+    - leadership
+    - team leadership
+    - people management
+    - team management
+  
+  problem_solving:
+    - problem solving
+    - problem-solving
+    - analytical thinking
+    - critical thinking
+  
+  project_management:
+    - project management
+    - pm
+    - pmp
+    - agile
+    - scrum
+    - kanban
+
+# =============================================================================
+# SKILL CATEGORIES - Hierarchical organization of skills
+# =============================================================================
+categories:
+  technical:
+    programming_languages:
+      - javascript
+      - python
+      - typescript
+      - java
+      - csharp
+      - cplusplus
+      - golang
+      - ruby
+      - php
+    
+    web_frameworks:
+      - react
+      - angular
+      - vue
+      - django
+      - flask
+      - fastapi
+      - spring
+      - express
+    
+    ml_ai:
+      - machine_learning
+      - deep_learning
+      - tensorflow
+      - pytorch
+      - keras
+      - scikit_learn
+      - natural_language_processing
+      - computer_vision
+    
+    data_analytics:
+      - sql
+      - nosql
+      - data_analysis
+      - data_engineering
+      - big_data
+    
+    cloud_devops:
+      - aws
+      - azure
+      - gcp
+      - docker
+      - kubernetes
+      - ci_cd
+      - terraform
+    
+    databases:
+      - postgresql
+      - mysql
+      - mongodb
+      - redis
+      - elasticsearch
+  
+  domain_specific:
+    logistics:
+      - warehouse_management
+      - transportation_management
+      - supply_chain_management
+      - erp
+      - demand_planning
+      - procurement
+      - inventory_optimization
+      - logistics_planning
+      - freight_forwarding
+      - customs_clearance
+      - last_mile_delivery
+      - reverse_logistics
+      - supply_chain_analytics
+      - six_sigma
+      - sap_mm
+      - sap_sd
+      - sap_ewm
+      - oracle_scm
+      - manhattan_wms
+      - blue_yonder
+  
+  soft_skills:
+    - communication
+    - leadership
+    - problem_solving
+    - project_management
+
+# =============================================================================
+# SKILL RELATIONSHIPS - Semantic similarity groups
+# =============================================================================
+# Skills within each group are semantically related (used for fuzzy matching)
+relationships:
+  python_ecosystem:
+    - python
+    - django
+    - flask
+    - fastapi
+    - pytorch
+    - tensorflow
+    - scikit_learn
+  
+  javascript_ecosystem:
+    - javascript
+    - typescript
+    - react
+    - angular
+    - vue
+    - nodejs
+    - express
+  
+  cloud_platforms:
+    - aws
+    - azure
+    - gcp
+  
+  container_orchestration:
+    - docker
+    - kubernetes
+  
+  relational_databases:
+    - postgresql
+    - mysql
+    - sql
+  
+  nosql_databases:
+    - mongodb
+    - redis
+    - elasticsearch
+  
+  ml_frameworks:
+    - tensorflow
+    - pytorch
+    - keras
+    - scikit_learn
+  
+  data_processing:
+    - big_data
+    - spark
+    - hadoop
+    - data_engineering
+  
+  logistics_systems:
+    - warehouse_management
+    - transportation_management
+    - supply_chain_management
+    - erp
+    - demand_planning
+    - procurement
+    - inventory_optimization
+    - logistics_planning
+    - freight_forwarding
+    - customs_clearance
+  
+  erp_systems:
+    - erp
+    - sap_mm
+    - sap_sd
+    - sap_ewm
+    - oracle_scm
+  
+  wms_systems:
+    - warehouse_management
+    - manhattan_wms
+    - blue_yonder
+    - sap_ewm
+
+# =============================================================================
+# SKILL WEIGHTS - Importance modifiers for different skill types
+# =============================================================================
+weights:
+  # Category-based weights
+  category_weights:
+    technical: 1.0
+    domain_specific: 1.25      # Logistics-specific skills get 25% boost
+    soft_skills: 0.8          # Soft skills important but weighted lower
+  
+  # Match type weights
+  match_type_weights:
+    exact_match: 1.0          # Perfect match
+    synonym_match: 0.95       # Synonym (e.g., "JS" for "JavaScript")
+    semantic_match: 0.85      # Semantically similar (e.g., "TensorFlow" for "PyTorch")
+    category_match: 0.7       # Same category (e.g., "React" when "Angular" required)
+
+# =============================================================================
+# MATCHING CONFIGURATION
+# =============================================================================
+matching:
+  # Semantic similarity threshold (0-1)
+  # Skills with cosine similarity >= this threshold are considered matches
+  # Lowered from 0.75 to 0.72 to be slightly more inclusive of related skills
+  semantic_similarity_threshold: 0.72
+  
+  # Enable/disable different matching strategies
+  enable_synonym_matching: true
+  enable_semantic_matching: true
+  enable_category_matching: false  # Disabled by default (too loose)
+  
+  # Skill normalization
+  case_sensitive: false
+  strip_special_chars: true
+  
+  # Partial skill matching (e.g., "machine learning" matches "deep learning")
+  enable_partial_matching: true
+  partial_match_min_words: 2
+
+# =============================================================================
+# SKILL PRIORITIZATION
+# =============================================================================
+prioritization:
+  # Boost for skills that appear in certain contexts
+  boost_multipliers:
+    required_skill: 1.5       # Required skills get 50% boost
+    preferred_skill: 1.0      # Preferred skills normal weight
+    years_experience_boost:   # Boost based on years of experience
+      0-1: 0.7
+      1-3: 1.0
+      3-5: 1.2
+      5+: 1.5
+
+# =============================================================================
+# INDUSTRY-SPECIFIC MAPPINGS (Logistics & Supply Chain)
+# =============================================================================
+industry_mappings:
+  logistics_essential:
+    # Core logistics tech skills
+    - warehouse_management
+    - transportation_management
+    - supply_chain_management
+    - erp
+    - demand_planning
+    - procurement
+    - inventory_optimization
+    - data_analysis
+    - sql
+    - excel
+  
+  logistics_nice_to_have:
+    # Advanced/emerging logistics tech
+    - machine_learning
+    - python
+    - big_data
+    - cloud_platforms
+    - power_bi
+    - tableau
+    - supply_chain_analytics
+
+# =============================================================================
+# EXCLUSIONS - Skills that should NOT be matched across certain boundaries
+# =============================================================================
+exclusions:
+  # Don't match these pairs even if semantically similar
+  do_not_match:
+    - [python, java]          # Different languages
+    - [react, angular]        # Competing frameworks
+    - [aws, azure]            # Different cloud providers
+    - [postgresql, mongodb]   # SQL vs NoSQL
