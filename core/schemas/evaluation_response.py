@@ -212,7 +212,7 @@ class EvaluationResponse(BaseModel):
 
     # ---- Recruiter Portal View ----
     quick_summary: Optional[str] = Field(
-        None, description="One-line summary for recruiters (e.g., '✅ Great exp, ⚠️ missing 2 skills')"
+        None, description="One-line summary for recruiters (e.g., 'Great exp, missing 2 skills')"
     )
     strengths: Optional[List[str]] = Field(
         default_factory=list, description="Key strengths of this candidate"
@@ -283,7 +283,7 @@ class EvaluationResponse(BaseModel):
                     "synonym": 1,
                     "semantic": 2,
                 },
-                "quick_summary": "✅ Perfect match with GCC experience",
+                "quick_summary": "Perfect match with GCC experience",
                 "strengths": ["100% required skills match", "8 years GCC experience"],
                 "concerns": [],
                 "confidence_metrics": {

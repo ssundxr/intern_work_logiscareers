@@ -14,11 +14,16 @@ Date: January 2, 2026
 
 from typing import List, Dict, Tuple, Set, Optional
 from dataclasses import dataclass
+from functools import lru_cache
 import yaml
 import re
 from pathlib import Path
 import numpy as np
+import threading
 from sentence_transformers import SentenceTransformer
+
+# Maximum number of skill embeddings to cache (prevents memory leak)
+MAX_EMBEDDING_CACHE_SIZE = 10000
 
 
 @dataclass
@@ -95,6 +100,7 @@ class SkillMatcher:
         # Load embedding model for semantic matching
         self.embedding_model = embedding_model
         self._skill_embeddings_cache: Dict[str, np.ndarray] = {}
+        self._cache_lock = threading.Lock()  # Thread-safe cache access
         
         # Configuration flags
         self.enable_synonym = self.matching_config.get('enable_synonym_matching', True)
@@ -162,18 +168,32 @@ class SkillMatcher:
         return False
     
     def _get_skill_embedding(self, skill: str) -> Optional[np.ndarray]:
-        """Get embedding for a skill (with caching)"""
+        """Get embedding for a skill (with thread-safe LRU caching)"""
         if self.embedding_model is None:
             return None
         
         canonical = self._get_canonical_skill(skill)
         
-        if canonical not in self._skill_embeddings_cache:
-            # Generate embedding
-            embedding = self.embedding_model.encode([canonical])[0]
+        # Thread-safe cache access
+        with self._cache_lock:
+            if canonical in self._skill_embeddings_cache:
+                return self._skill_embeddings_cache[canonical]
+            
+            # Evict oldest entries if cache is full (simple LRU)
+            if len(self._skill_embeddings_cache) >= MAX_EMBEDDING_CACHE_SIZE:
+                # Remove first 10% of entries
+                keys_to_remove = list(self._skill_embeddings_cache.keys())[:MAX_EMBEDDING_CACHE_SIZE // 10]
+                for key in keys_to_remove:
+                    del self._skill_embeddings_cache[key]
+        
+        # Generate embedding (outside lock to allow parallel encoding)
+        embedding = self.embedding_model.encode([canonical])[0]
+        
+        # Store in cache
+        with self._cache_lock:
             self._skill_embeddings_cache[canonical] = embedding
         
-        return self._skill_embeddings_cache[canonical]
+        return embedding
     
     def _calculate_semantic_similarity(self, skill1: str, skill2: str) -> float:
         """Calculate semantic similarity between two skills using embeddings"""

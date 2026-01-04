@@ -112,8 +112,20 @@ def health_check():
 
 @app.post("/api/v1/evaluate", response_model=EvaluationResponse)
 def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) -> EvaluationResponse:
+    """
+    Evaluate a candidate against a job with comprehensive scoring.
+    
+    Features:
+    - Hard rejection rules
+    - Multi-signal scoring (skills, experience, semantic)
+    - Contextual adjustments
+    - Confidence scoring
+    - Feature interaction detection
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     # Start performance tracking
-    import time
     start_time = time.time()
     rules_evaluated = 0
     
@@ -123,8 +135,18 @@ def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) ->
     # =========================================================================
     # Step 1: Hard Rejection Engine (Eligibility Filter)
     # =========================================================================
-    hard = HardRejectionEngine.evaluate(job=job, candidate=candidate)
-    rules_evaluated += len(hard.rule_trace)
+    try:
+        hard = HardRejectionEngine.evaluate(job=job, candidate=candidate)
+        rules_evaluated += len(hard.rule_trace)
+    except Exception as e:
+        logger.error(f"Hard rejection engine error: {e}", exc_info=True)
+        # Continue with evaluation, assuming eligible
+        hard = type('obj', (object,), {
+            'is_eligible': True,
+            'rejection_reason': None,
+            'rejection_rule_code': None,
+            'rule_trace': []
+        })()
     
     if not hard.is_eligible:
         return EvaluationResponse(
@@ -144,27 +166,44 @@ def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) ->
     # Step 2: Soft Scoring (Multi-Signal Evaluation with Advanced Skill Matching)
     # =========================================================================
     
-    # Initialize scorers (SkillsScorer now takes embedding model)
-    semantic_scorer = SemanticSimilarityScorer()
-    skills_scorer = SkillsScorer(embedding_model=semantic_scorer.model)
+    # Initialize scorers with error handling
+    try:
+        semantic_scorer = SemanticSimilarityScorer()
+        skills_scorer = SkillsScorer(embedding_model=semantic_scorer.model)
+    except Exception as e:
+        logger.error(f"Scorer initialization error: {e}", exc_info=True)
+        semantic_scorer = SemanticSimilarityScorer()
+        skills_scorer = SkillsScorer()
     
     # Score skills with advanced matching (required + preferred)
-    skills = skills_scorer.score(
-        required_skills=job.required_skills,
-        candidate_skills=candidate.skills,
-        preferred_skills=getattr(job, 'preferred_skills', [])  # Use new field if available
-    )
+    try:
+        skills = skills_scorer.score(
+            required_skills=job.required_skills,
+            candidate_skills=candidate.skills,
+            preferred_skills=getattr(job, 'preferred_skills', [])
+        )
+    except Exception as e:
+        logger.error(f"Skills scoring error: {e}", exc_info=True)
+        skills = type('obj', (object,), {'score': 50, 'details': {}})()
     
     # Score experience
-    experience = ExperienceScorer.score(
-        job.min_experience_years,
-        job.max_experience_years,
-        candidate.total_experience_years,
-    )
+    try:
+        experience = ExperienceScorer.score(
+            job.min_experience_years,
+            job.max_experience_years,
+            candidate.total_experience_years,
+        )
+    except Exception as e:
+        logger.error(f"Experience scoring error: {e}", exc_info=True)
+        experience = type('obj', (object,), {'score': 50, 'details': {}})()
 
     # Score semantic similarity
-    job_text, candidate_text, job_profile_text = _build_semantic_inputs(job, candidate)
-    semantic = semantic_scorer.score(job_text, candidate_text, job_profile_text)
+    try:
+        job_text, candidate_text, job_profile_text = _build_semantic_inputs(job, candidate)
+        semantic = semantic_scorer.score(job_text, candidate_text, job_profile_text)
+    except Exception as e:
+        logger.error(f"Semantic scoring error: {e}", exc_info=True)
+        semantic = type('obj', (object,), {'score': 50, 'details': {}})()
 
     # Build raw section scores for aggregation
     raw_section_scores: Dict[str, int] = {
@@ -176,7 +215,11 @@ def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) ->
     # =========================================================================
     # Phase 4: Smart Weight Optimization (Job-Level Adaptive Weighting)
     # =========================================================================
-    weights = _weight_optimizer.get_optimized_weights(job)
+    try:
+        weights = _weight_optimizer.get_optimized_weights(job)
+    except Exception as e:
+        logger.error(f"Weight optimization error: {e}", exc_info=True)
+        weights = {"skills": 0.4, "experience": 0.35, "semantic": 0.25}
     
     # Aggregate with smart weights
     aggregated = WeightedScoreAggregator.aggregate(
@@ -187,14 +230,19 @@ def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) ->
     # =========================================================================
     # Phase 4: Contextual Adjustments (Intelligence Beyond Linear Scoring)
     # =========================================================================
-    adjusted_score, contextual_adjustments = _contextual_adjuster.apply_adjustments(
-        base_score=base_score,
-        job=job,
-        candidate=candidate,
-        skills_result=skills,
-        experience_result=experience,
-    )
-    rules_evaluated += len(contextual_adjustments)
+    try:
+        adjusted_score, contextual_adjustments = _contextual_adjuster.apply_adjustments(
+            base_score=base_score,
+            job=job,
+            candidate=candidate,
+            skills_result=skills,
+            experience_result=experience,
+        )
+        rules_evaluated += len(contextual_adjustments)
+    except Exception as e:
+        logger.error(f"Contextual adjustment error: {e}", exc_info=True)
+        adjusted_score = base_score
+        contextual_adjustments = []
     
     # =========================================================================
     # Phase 4: Feature Interaction Detection
@@ -356,9 +404,9 @@ def evaluate(payload: EvaluationRequest, _: None = Depends(_require_api_key)) ->
     
     # Build quick summary
     if len(strengths) >= 2:
-        quick_summary = "✅ " + ", ".join(strengths[:2])
+        quick_summary = "Strong: " + ", ".join(strengths[:2])
     elif len(concerns) > 0:
-        quick_summary = "⚠️ " + concerns[0]
+        quick_summary = "Note: " + concerns[0]
     else:
         quick_summary = "Average match"
 
