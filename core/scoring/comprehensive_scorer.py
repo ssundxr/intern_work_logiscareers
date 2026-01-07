@@ -150,10 +150,11 @@ class ComprehensiveScorer:
     - Per-field scoring with explanations
     - Section-level aggregation
     - CV/Resume content analysis
-    - Semantic skill matching
-    - Experience relevance analysis
-    - Education compatibility scoring
+    - Semantic skill matching with weighted importance
+    - Experience relevance analysis with recency bias
+    - Education compatibility with field relevance
     - Salary expectation alignment
+    - Industry-specific scoring adjustments
     - Location/availability matching
     """
     
@@ -165,6 +166,43 @@ class ComprehensiveScorer:
         'skills': 0.25,
         'salary': 0.10,
         'cv_analysis': 0.15
+    }
+    
+    # Skill importance weights - NEW
+    SKILL_IMPORTANCE_WEIGHTS = {
+        'required': 2.0,      # Critical skills - double weight
+        'preferred': 1.0,     # Standard weight  
+        'nice_to_have': 0.5   # Bonus skills - half weight
+    }
+    
+    # Industry-specific boost factors - NEW
+    INDUSTRY_ADJUSTMENTS = {
+        'logistics': {
+            'gcc_experience_multiplier': 1.3,
+            'arabic_language_bonus': 10,
+            'transport_certifications_bonus': 15,
+            'warehouse_experience_bonus': 8,
+        },
+        'technology': {
+            'recent_skills_multiplier': 1.4,
+            'github_profile_bonus': 5,
+            'modern_tech_stack_bonus': 12,
+        },
+        'finance': {
+            'certifications_multiplier': 1.5,
+            'compliance_experience_bonus': 10,
+        },
+        'healthcare': {
+            'certifications_multiplier': 1.6,
+            'patient_care_experience_bonus': 12,
+        }
+    }
+    
+    # Experience recency decay factors - NEW
+    EXPERIENCE_RECENCY_WEIGHTS = {
+        'current_or_recent': 1.0,     # 0-2 years ago
+        'moderately_recent': 0.85,     # 3-5 years ago
+        'older': 0.6,                  # 6+ years ago
     }
     
     def __init__(self, skill_matcher=None, embedding_model=None):
@@ -455,10 +493,14 @@ class ComprehensiveScorer:
         candidate_data: Dict[str, Any],
         job_data: Dict[str, Any]
     ) -> SectionAssessment:
-        """Assess work experience comprehensively."""
+        """Assess work experience with recency weighting."""
         fields = []
         
-        # Total Experience
+        # Get current year for recency calculations
+        from datetime import datetime
+        current_year = datetime.now().year
+        
+        # Total Experience with recency weighting
         candidate_exp = candidate_data.get('total_experience_years', 0)
         min_exp = job_data.get('min_experience_years', 0)
         max_exp = job_data.get('max_experience_years')
@@ -466,25 +508,48 @@ class ComprehensiveScorer:
         if max_exp is None:
             max_exp = min_exp + 10  # Reasonable range if not specified
         
+        # Apply recency weight based on most recent work
+        # Check if candidate has recent employment history
+        employment_summary = candidate_data.get('employment_summary', '')
+        recency_weight = 1.0  # Default
+        recency_note = ""
+        
+        # Simple heuristic: if mentions recent years or "current", higher weight
+        if any(str(year) in employment_summary for year in range(current_year - 2, current_year + 1)):
+            recency_weight = self.EXPERIENCE_RECENCY_WEIGHTS['current']
+            recency_note = " (recent/current)"
+        elif any(str(year) in employment_summary for year in range(current_year - 5, current_year - 2)):
+            recency_weight = self.EXPERIENCE_RECENCY_WEIGHTS['moderately_recent']
+            recency_note = " (moderately recent)"
+        else:
+            recency_weight = self.EXPERIENCE_RECENCY_WEIGHTS['older']
+            recency_note = " (needs verification)"
+        
+        # Calculate experience score with recency adjustment
         if candidate_exp >= min_exp and candidate_exp <= max_exp:
-            exp_score = 100
-            exp_explanation = f"{candidate_exp:.1f} years perfectly matches required range ({min_exp}-{max_exp} years)"
+            base_exp_score = 100
+            exp_explanation = f"{candidate_exp:.1f} years perfectly matches required range ({min_exp}-{max_exp} years){recency_note}"
         elif candidate_exp >= min_exp:
             if candidate_exp <= max_exp + 5:
-                exp_score = 85
-                exp_explanation = f"{candidate_exp:.1f} years experience exceeds maximum ({max_exp}), but within acceptable range"
+                base_exp_score = 85
+                exp_explanation = f"{candidate_exp:.1f} years experience exceeds maximum ({max_exp}), but within acceptable range{recency_note}"
             else:
-                exp_score = 70
-                exp_explanation = f"{candidate_exp:.1f} years may be overqualified for this role (requires {min_exp}-{max_exp} years)"
+                base_exp_score = 70
+                exp_explanation = f"{candidate_exp:.1f} years may be overqualified for this role (requires {min_exp}-{max_exp} years){recency_note}"
         elif candidate_exp >= min_exp - 1:
-            exp_score = 75
-            exp_explanation = f"{candidate_exp:.1f} years is slightly below minimum ({min_exp} years), but close"
+            base_exp_score = 75
+            exp_explanation = f"{candidate_exp:.1f} years is slightly below minimum ({min_exp} years), but close{recency_note}"
         elif candidate_exp >= min_exp * 0.5:
-            exp_score = 50
-            exp_explanation = f"{candidate_exp:.1f} years experience is below minimum requirement of {min_exp} years"
+            base_exp_score = 50
+            exp_explanation = f"{candidate_exp:.1f} years experience is below minimum requirement of {min_exp} years{recency_note}"
         else:
-            exp_score = 25
-            exp_explanation = f"Insufficient experience: {candidate_exp:.1f} years vs required {min_exp} years"
+            base_exp_score = 25
+            exp_explanation = f"Insufficient experience: {candidate_exp:.1f} years vs required {min_exp} years{recency_note}"
+        
+        # Apply recency weight
+        exp_score = int(base_exp_score * recency_weight)
+        if recency_weight < 1.0:
+            exp_explanation += f". Score adjusted for recency ({recency_weight:.0%})"
         
         fields.append(FieldAssessment(
             field_name='total_experience',
@@ -739,7 +804,7 @@ class ComprehensiveScorer:
         candidate_data: Dict[str, Any],
         job_data: Dict[str, Any]
     ) -> SectionAssessment:
-        """Assess skills matching with detailed breakdown."""
+        """Assess skills matching with weighted importance and industry adjustments."""
         fields = []
         
         # Get all candidate skills
@@ -756,24 +821,35 @@ class ComprehensiveScorer:
         required_skills = job_data.get('required_skills', []) or []
         preferred_skills = job_data.get('preferred_skills', []) or []
         
-        # Match required skills
+        # Get industry for adjustments
+        industry = job_data.get('industry', '').lower()
+        industry_adjustments = self.INDUSTRY_ADJUSTMENTS.get(industry, {})
+        
+        # Match required skills with weighted scoring
         matched_required = []
         missing_required = []
+        required_weighted_score = 0
+        max_required_weight = 0
         
         for skill in required_skills:
             skill_lower = skill.lower().strip()
+            weight = self.SKILL_IMPORTANCE_WEIGHTS['required']
+            max_required_weight += weight
+            
             # Direct match or partial match
             if skill_lower in candidate_skills or any(skill_lower in cs or cs in skill_lower for cs in candidate_skills):
                 matched_required.append(skill)
+                required_weighted_score += weight
             else:
                 missing_required.append(skill)
         
         if required_skills:
-            req_match_pct = (len(matched_required) / len(required_skills)) * 100
+            req_match_pct = (required_weighted_score / max_required_weight) * 100 if max_required_weight > 0 else 0
             req_score = int(req_match_pct)
-            req_explanation = f"Matched {len(matched_required)}/{len(required_skills)} required skills ({req_match_pct:.0f}%)"
+            req_explanation = f"Matched {len(matched_required)}/{len(required_skills)} required skills ({req_match_pct:.0f}% weighted)"
             if missing_required:
-                req_explanation += f". Missing: {', '.join(missing_required[:3])}"
+                critical_missing = missing_required[:3]
+                req_explanation += f". Critical gaps: {', '.join(critical_missing)}"
                 if len(missing_required) > 3:
                     req_explanation += f" (+{len(missing_required) - 3} more)"
         else:
@@ -791,18 +867,24 @@ class ComprehensiveScorer:
             weight=2.0
         ))
         
-        # Match preferred skills
+        # Match preferred skills with weighted scoring
         matched_preferred = []
+        preferred_weighted_score = 0
+        max_preferred_weight = 0
         
         for skill in preferred_skills:
             skill_lower = skill.lower().strip()
+            weight = self.SKILL_IMPORTANCE_WEIGHTS['preferred']
+            max_preferred_weight += weight
+            
             if skill_lower in candidate_skills or any(skill_lower in cs or cs in skill_lower for cs in candidate_skills):
                 matched_preferred.append(skill)
+                preferred_weighted_score += weight
         
         if preferred_skills:
-            pref_match_pct = (len(matched_preferred) / len(preferred_skills)) * 100
+            pref_match_pct = (preferred_weighted_score / max_preferred_weight) * 100 if max_preferred_weight > 0 else 0
             pref_score = int(pref_match_pct)
-            pref_explanation = f"Matched {len(matched_preferred)}/{len(preferred_skills)} preferred skills ({pref_match_pct:.0f}%)"
+            pref_explanation = f"Matched {len(matched_preferred)}/{len(preferred_skills)} preferred skills ({pref_match_pct:.0f}% weighted)"
         else:
             pref_score = 100
             pref_explanation = "No preferred skills specified"
@@ -832,7 +914,46 @@ class ComprehensiveScorer:
         ))
         
         # Calculate weighted section score (required skills have more weight)
-        section_score = self._calculate_section_score(fields)
+        base_section_score = self._calculate_section_score(fields)
+        
+        # Apply industry-specific adjustments
+        section_score = base_section_score
+        industry_bonus = 0
+        adjustment_details = []
+        
+        if industry_adjustments:
+            # Check for industry-specific skill bonuses
+            if 'skill_multipliers' in industry_adjustments:
+                for skill_key, multiplier in industry_adjustments['skill_multipliers'].items():
+                    if skill_key in candidate_data or any(skill_key.lower() in str(v).lower() for v in candidate_skills):
+                        bonus = int((multiplier - 1.0) * base_section_score)
+                        industry_bonus += bonus
+                        adjustment_details.append(f"{skill_key.replace('_', ' ').title()} (+{bonus})")
+            
+            # Check for certification bonuses
+            if 'certifications' in industry_adjustments:
+                candidate_certs = set(str(c).lower() for c in candidate_data.get('certifications', []) or [])
+                for cert_key, bonus_points in industry_adjustments['certifications'].items():
+                    if any(cert_key.lower() in cert for cert in candidate_certs):
+                        industry_bonus += bonus_points
+                        adjustment_details.append(f"{cert_key} cert (+{bonus_points})")
+            
+            # Check for language bonuses
+            if 'languages' in industry_adjustments:
+                candidate_langs = set(str(l).lower() for l in candidate_data.get('languages', []) or [])
+                for lang_key, bonus_points in industry_adjustments['languages'].items():
+                    if any(lang_key.lower() in lang for lang in candidate_langs):
+                        industry_bonus += bonus_points
+                        adjustment_details.append(f"{lang_key.title()} language (+{bonus_points})")
+        
+        section_score = min(100, base_section_score + industry_bonus)
+        
+        # Update explanation if adjustments applied
+        base_explanation = self._generate_section_explanation('skills', base_section_score, fields)
+        if adjustment_details:
+            final_explanation = f"{base_explanation}. Industry bonuses: {', '.join(adjustment_details)}"
+        else:
+            final_explanation = base_explanation
         
         return SectionAssessment(
             section_name='skills',
@@ -840,7 +961,7 @@ class ComprehensiveScorer:
             fields=fields,
             total_score=section_score,
             weighted_score=section_score * self.SECTION_WEIGHTS['skills'],
-            explanation=self._generate_section_explanation('skills', section_score, fields),
+            explanation=final_explanation,
             match_level=self._get_match_level(section_score),
             weight=self.SECTION_WEIGHTS['skills']
         )
@@ -971,21 +1092,38 @@ class ComprehensiveScorer:
         quality_score = int((sum(quality_indicators.values()) / len(quality_indicators)) * 100)
         
         # 2. Keyword Match Score
+        # Only use explicit skills from required_skills and preferred_skills
         job_keywords = []
         for field in ['required_skills', 'preferred_skills', 'keywords']:
             skills = job_data.get(field, [])
             if isinstance(skills, list):
                 job_keywords.extend(skills)
         
-        # Add from job description
-        job_desc = job_data.get('job_description', '') + ' ' + job_data.get('title', '')
-        # Extract key terms
-        key_terms = re.findall(r'\b[A-Za-z]{3,}\b', job_desc)
-        common_words = {'the', 'and', 'for', 'with', 'this', 'that', 'will', 'have', 'from', 'they', 'are', 'been', 'has'}
-        job_keywords.extend([t for t in key_terms if t.lower() not in common_words])
+        # Extended stopwords list - filter out common English words
+        stopwords = {
+            'the', 'and', 'for', 'with', 'this', 'that', 'will', 'have', 'from', 'they', 
+            'are', 'been', 'has', 'was', 'were', 'can', 'could', 'should', 'would', 'may',
+            'our', 'your', 'their', 'his', 'her', 'its', 'who', 'what', 'when', 'where',
+            'why', 'how', 'all', 'each', 'every', 'some', 'any', 'many', 'much', 'more',
+            'most', 'other', 'into', 'through', 'during', 'before', 'after', 'above',
+            'below', 'between', 'under', 'again', 'further', 'then', 'once', 'here',
+            'there', 'when', 'where', 'why', 'how', 'all', 'both', 'each', 'few', 'more',
+            'most', 'other', 'some', 'such', 'only', 'own', 'same', 'than', 'too', 'very',
+            'about', 'also', 'being', 'but', 'not', 'you', 'she', 'one', 'two', 'three',
+            'applications', 'contribute', 'development', 'team', 'engineer', 'detail',
+            'strong', 'career', 'level', 'motivated', 'scalable', 'fast', 'maintenance',
+            'professionals', 'within', 'work', 'working', 'experience', 'position', 'role',
+            'company', 'opportunity', 'looking', 'candidate', 'ideal', 'seeking', 'join',
+            'dynamic', 'growing', 'dedicated', 'passionate', 'committed', 'focused',
+            'responsible', 'required', 'preferred', 'must', 'able', 'ability', 'excellent',
+            'good', 'great', 'best', 'top', 'high', 'well', 'years', 'year', 'degree',
+            'duties', 'responsibilities', 'skills', 'requirements', 'qualifications'
+        }
         
-        job_keywords = list(set(k.lower() for k in job_keywords if len(k) > 2))
+        # Clean and filter job keywords - only keep actual technical skills/tools
+        job_keywords = list(set(k.lower().strip() for k in job_keywords if k and len(k.strip()) > 2 and k.lower().strip() not in stopwords))
         
+        # Match keywords in CV
         matched_keywords = [kw for kw in job_keywords if kw in cv_lower]
         missing_keywords = [kw for kw in job_keywords if kw not in cv_lower][:10]  # Top 10 missing
         

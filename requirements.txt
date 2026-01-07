@@ -6,3 +6,5 @@ numpy
 pytest
 requests
 httpx<0.28
+sentence-transformers
+torch
