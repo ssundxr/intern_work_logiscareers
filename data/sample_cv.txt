@@ -1,0 +1,14 @@
+Sample CV text for candidate evaluation demo.
+
+Machine Learning Engineer
+ 
+Summary
+- 5+ years building ML systems for ranking and matching.
+- Strong Python, FastAPI, and embeddings-based semantic search.
+ 
+Experience
+- Built candidate-job matching services using sentence embeddings and business rules.
+- Designed scoring/aggregation pipelines with explainability.
+ 
+Skills
+Python, Machine Learning, NLP, FastAPI, NumPy, SQL
