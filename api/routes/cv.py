@@ -1,21 +1,18 @@
 # CV Parsing API Routes
 # api/routes/cv.py
 #
-# Provides REST API endpoints for CV parsing operations:
+# REST API endpoints for CV parsing operations:
 # - Parse CV text and return structured data
 # - Parse CV and auto-create a Candidate object
 # - Parse CV and directly evaluate against a job
 
-from datetime import datetime
 from typing import Dict, List, Optional, Any
-import uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
-from logis_ai_candidate_engine.ml.cv_parser import CVParser, ParsedCV
-from logis_ai_candidate_engine.ml.cv_candidate_mapper import CVToCandidateMapper
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
+from logis_ai_candidate_engine.application.dependencies import get_cv_service
+from logis_ai_candidate_engine.application.cv_service import CVService
 
 
 # =============================================================================
@@ -131,33 +128,16 @@ class CVSkillsExtractionResponse(BaseModel):
 
 router = APIRouter(prefix="/cv", tags=["CV Parsing"])
 
-# Singleton parser instance
-_parser: Optional[CVParser] = None
-_mapper: Optional[CVToCandidateMapper] = None
-
-
-def get_parser() -> CVParser:
-    """Get or create the CV parser singleton"""
-    global _parser
-    if _parser is None:
-        _parser = CVParser()
-    return _parser
-
-
-def get_mapper() -> CVToCandidateMapper:
-    """Get or create the CV mapper singleton"""
-    global _mapper
-    if _mapper is None:
-        _mapper = CVToCandidateMapper()
-    return _mapper
-
 
 # =============================================================================
 # ENDPOINTS
 # =============================================================================
 
 @router.post("/parse", response_model=ParsedCVResponse)
-def parse_cv(request: ParseCVRequest) -> ParsedCVResponse:
+def parse_cv_endpoint(
+    request: ParseCVRequest,
+    service: CVService = Depends(get_cv_service)
+) -> ParsedCVResponse:
     """
     Parse raw CV text and extract structured information.
     
@@ -175,26 +155,8 @@ def parse_cv(request: ParseCVRequest) -> ParsedCVResponse:
     3. Skill extraction using the Logis Career skill taxonomy
     """
     try:
-        parser = get_parser()
-        result = parser.parse(request.cv_text)
-        
-        return ParsedCVResponse(
-            success=True,
-            name=result.name,
-            email=result.contact.email,
-            phone=result.contact.phone,
-            linkedin_url=result.contact.linkedin_url,
-            summary=result.summary,
-            skills=[s.to_dict() for s in result.skills],
-            experience=[e.to_dict() for e in result.experience],
-            education=[e.to_dict() for e in result.education],
-            total_experience_years=result.total_experience_years,
-            languages=result.languages,
-            extraction_confidence=result.extraction_confidence,
-            parsing_warnings=result.parsing_warnings,
-            parsed_at=datetime.now().isoformat(),
-        )
-    
+        result = service.parse_cv(request.cv_text)
+        return ParsedCVResponse(**result)
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -203,7 +165,10 @@ def parse_cv(request: ParseCVRequest) -> ParsedCVResponse:
 
 
 @router.post("/parse-to-candidate", response_model=CVToCandidateResponse)
-def parse_cv_to_candidate(request: CVToCandidateRequest) -> CVToCandidateResponse:
+def parse_cv_to_candidate_endpoint(
+    request: CVToCandidateRequest,
+    service: CVService = Depends(get_cv_service)
+) -> CVToCandidateResponse:
     """
     Parse CV text and create a fully-formed Candidate object.
     
@@ -219,47 +184,18 @@ def parse_cv_to_candidate(request: CVToCandidateRequest) -> CVToCandidateRespons
     - Standardize candidate data extraction
     """
     try:
-        parser = get_parser()
-        mapper = get_mapper()
-        
-        # Parse the CV
-        parsed = parser.parse(request.cv_text)
-        
-        # Generate candidate ID if not provided
-        candidate_id = request.candidate_id or f"cv_parsed_{uuid.uuid4().hex[:8]}"
-        
-        # Prepare additional data from request
-        additional_data = {}
-        if request.nationality:
-            additional_data["nationality"] = request.nationality
-        if request.current_country:
-            additional_data["current_country"] = request.current_country
-        if request.expected_salary is not None:
-            additional_data["expected_salary"] = request.expected_salary
-        if request.currency:
-            additional_data["currency"] = request.currency
-        if request.total_experience_years is not None:
-            additional_data["total_experience_years"] = request.total_experience_years
-        if request.visa_status:
-            additional_data["visa_status"] = request.visa_status
-        if request.gcc_experience_years is not None:
-            additional_data["gcc_experience_years"] = request.gcc_experience_years
-        
-        # Map to Candidate
-        candidate = mapper.map(
-            parsed_cv=parsed,
-            candidate_id=candidate_id,
-            additional_data=additional_data if additional_data else None,
+        result = service.parse_cv_to_candidate(
+            cv_text=request.cv_text,
+            candidate_id=request.candidate_id,
+            nationality=request.nationality,
+            current_country=request.current_country,
+            expected_salary=request.expected_salary,
+            currency=request.currency,
+            total_experience_years=request.total_experience_years,
+            visa_status=request.visa_status,
+            gcc_experience_years=request.gcc_experience_years,
         )
-        
-        return CVToCandidateResponse(
-            success=True,
-            candidate=candidate.model_dump(),
-            parsing_confidence=parsed.extraction_confidence,
-            parsing_warnings=parsed.parsing_warnings,
-            created_at=datetime.now().isoformat(),
-        )
-    
+        return CVToCandidateResponse(**result)
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -268,7 +204,10 @@ def parse_cv_to_candidate(request: CVToCandidateRequest) -> CVToCandidateRespons
 
 
 @router.post("/extract-skills", response_model=CVSkillsExtractionResponse)
-def extract_skills_from_cv(request: CVSkillsExtractionRequest) -> CVSkillsExtractionResponse:
+def extract_skills_endpoint(
+    request: CVSkillsExtractionRequest,
+    service: CVService = Depends(get_cv_service)
+) -> CVSkillsExtractionResponse:
     """
     Extract only skills from CV text.
     
@@ -282,21 +221,8 @@ def extract_skills_from_cv(request: CVSkillsExtractionRequest) -> CVSkillsExtrac
     was found in.
     """
     try:
-        parser = get_parser()
-        result = parser.parse(request.cv_text)
-        
-        if request.normalize:
-            skills = list(set(s.normalized_skill.replace('_', ' ').title() for s in result.skills))
-        else:
-            skills = list(set(s.skill for s in result.skills))
-        
-        return CVSkillsExtractionResponse(
-            success=True,
-            skills=skills,
-            skill_details=[s.to_dict() for s in result.skills],
-            total_skills_found=len(result.skills),
-        )
-    
+        result = service.extract_skills(request.cv_text, normalize=request.normalize)
+        return CVSkillsExtractionResponse(**result)
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -305,20 +231,6 @@ def extract_skills_from_cv(request: CVSkillsExtractionRequest) -> CVSkillsExtrac
 
 
 @router.get("/health")
-def cv_parser_health():
+def cv_parser_health(service: CVService = Depends(get_cv_service)):
     """Health check for CV parsing service"""
-    try:
-        parser = get_parser()
-        return {
-            "status": "healthy",
-            "service": "cv-parser",
-            "parser_ready": parser is not None,
-            "timestamp": datetime.now().isoformat(),
-        }
-    except Exception as e:
-        return {
-            "status": "unhealthy",
-            "service": "cv-parser",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat(),
-        }
+    return service.check_health()

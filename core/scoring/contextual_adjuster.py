@@ -257,13 +257,12 @@ class ContextualAdjuster:
                 
                 # Create adjustment record
                 adjustment = ContextualAdjustment(
-                    rule_id=rule.rule_id,
+                    rule_code=rule.rule_id,
                     rule_name=rule.rule_name,
                     adjustment_type=rule.adjustment_type,
-                    points=points,
+                    impact=points,
                     reason=rule.description,
-                    confidence=0.95,  # High confidence in explicit rules
-                    triggered_by=self._get_trigger_features(rule, features),
+                    confidence=0.95,
                 )
                 
                 adjustments_applied.append(adjustment)
@@ -302,10 +301,10 @@ class ContextualAdjuster:
             features['experience_over_max_years'] = 0
         
         # === SALARY POSITION ===
-        if job.min_salary and job.max_salary and job.max_salary > job.min_salary:
-            midpoint = (job.min_salary + job.max_salary) / 2
-            range_size = job.max_salary - job.min_salary
-            features['salary_position'] = (candidate.expected_salary - job.min_salary) / range_size
+        if job.salary_min and job.salary_max and job.salary_max > job.salary_min:
+            midpoint = (job.salary_min + job.salary_max) / 2
+            range_size = job.salary_max - job.salary_min
+            features['salary_position'] = (candidate.expected_salary - job.salary_min) / range_size
         else:
             features['salary_position'] = 0.5  # Default to midpoint
         

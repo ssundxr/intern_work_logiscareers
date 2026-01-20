@@ -37,6 +37,7 @@ def _job_payload() -> dict:
 def _candidate_payload() -> dict:
     return {
         "candidate_id": "cand-1",
+        "nationality": "Indian",
         "current_country": "UAE",
         "availability_to_join_days": None,
         "expected_salary": 15000,
@@ -61,7 +62,7 @@ def test_evaluate_returns_shortlist(monkeypatch) -> None:
  
     assert resp.status_code == 200
     data = resp.json()
-    assert data["decision"] == "SHORTLIST"
+    assert data["decision"] in ["STRONG_MATCH", "POTENTIAL_MATCH"]
     assert isinstance(data.get("total_score"), int)
     assert data.get("section_scores") is not None
     assert data.get("explanations") is not None
@@ -104,7 +105,7 @@ def test_evaluate_low_confidence_and_rejected_paths(monkeypatch) -> None:
  
     assert resp.status_code == 200
     data = resp.json()
-    assert data["decision"] in {"LOW_CONFIDENCE", "REJECTED"}
+    assert data["decision"] in ["WEAK_MATCH", "NOT_RECOMMENDED", "REJECTED"]
  
     very_low_candidate = _candidate_payload()
     very_low_candidate["skills"] = []
@@ -116,4 +117,4 @@ def test_evaluate_low_confidence_and_rejected_paths(monkeypatch) -> None:
  
     assert resp2.status_code == 200
     data2 = resp2.json()
-    assert data2["decision"] in {"LOW_CONFIDENCE", "REJECTED"}
+    assert data2["decision"] in ["WEAK_MATCH", "NOT_RECOMMENDED", "REJECTED"]

@@ -114,11 +114,11 @@ class ConfidenceCalculator:
         confidence_level = self._score_to_level(confidence_score)
         
         return ConfidenceMetrics(
-            overall_confidence=confidence_level,
+            confidence_level=confidence_level,
             confidence_score=confidence_score,
             uncertainty_factors=uncertainty_factors,
             signal_agreement=signal_agreement,
-            data_quality_score=data_quality.completeness_score,
+            data_completeness=data_quality.completeness_score,
         )
     
     def _assess_data_quality(
@@ -269,7 +269,7 @@ class ConfidenceCalculator:
         if job.max_experience_years and candidate.total_experience_years > job.max_experience_years * 1.5:
             factors.append("significant_overqualification")
         
-        if candidate.expected_salary > job.max_salary * 1.2:
+        if candidate.expected_salary > job.salary_max * 1.2:
             factors.append("salary_expectation_very_high")
         
         return factors[:5]  # Return top 5 factors
@@ -308,3 +308,4 @@ class ConfidenceCalculator:
             return "medium"
         else:
             return "low"
+

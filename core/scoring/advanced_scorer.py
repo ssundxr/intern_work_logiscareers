@@ -56,11 +56,10 @@ class FeatureInteractionDetector:
         # Interaction 1: Skills compensate for experience gap
         if self._skills_compensate_experience(section_scores, candidate, job):
             interactions.append(FeatureInteraction(
-                interaction_id="SKILLS_COMP_EXP",
-                features=["skills", "experience"],
                 interaction_type="compensation",
+                features_involved=["skills", "experience"],
                 impact=3.0,
-                explanation=(
+                description=(
                     "Exceptional skills (>90) partially compensate for lower experience. "
                     "Candidate may be a fast learner or self-taught expert."
                 )
@@ -69,11 +68,10 @@ class FeatureInteractionDetector:
         # Interaction 2: Experience compensates for skill gaps
         if self._experience_compensates_skills(section_scores, candidate, job):
             interactions.append(FeatureInteraction(
-                interaction_id="EXP_COMP_SKILLS",
-                features=["experience", "skills"],
                 interaction_type="compensation",
+                features_involved=["experience", "skills"],
                 impact=2.0,
-                explanation=(
+                description=(
                     "Extensive experience (>max) partially compensates for missing skills. "
                     "Senior candidates can learn new technologies quickly."
                 )
@@ -82,11 +80,10 @@ class FeatureInteractionDetector:
         # Interaction 3: Salary-skills trade-off
         if self._salary_skills_tradeoff(section_scores, candidate, job):
             interactions.append(FeatureInteraction(
-                interaction_id="SALARY_SKILLS_TRADEOFF",
-                features=["salary", "skills"],
                 interaction_type="amplification",
+                features_involved=["salary", "skills"],
                 impact=4.0,
-                explanation=(
+                description=(
                     "Exceptional skills + reasonable salary expectations = highly attractive candidate. "
                     "This combination increases value significantly."
                 )
@@ -95,11 +92,10 @@ class FeatureInteractionDetector:
         # Interaction 4: Career changer detection
         if self._detect_career_changer(section_scores):
             interactions.append(FeatureInteraction(
-                interaction_id="CAREER_CHANGER",
-                features=["semantic", "skills"],
                 interaction_type="pattern_detection",
+                features_involved=["semantic", "skills"],
                 impact=0.0,
-                explanation=(
+                description=(
                     "High skills but low semantic match suggests career change. "
                     "May need extra screening but could be high-potential hire."
                 )
@@ -108,11 +104,10 @@ class FeatureInteractionDetector:
         # Interaction 5: Perfect candidate amplification
         if self._perfect_candidate_amplification(section_scores):
             interactions.append(FeatureInteraction(
-                interaction_id="PERFECT_CANDIDATE_AMP",
-                features=["skills", "experience", "semantic"],
                 interaction_type="amplification",
+                features_involved=["skills", "experience", "semantic"],
                 impact=5.0,
-                explanation=(
+                description=(
                     "All scoring signals are exceptional (>85). "
                     "This is a rare perfect match - prioritize immediate contact."
                 )
@@ -169,7 +164,7 @@ class FeatureInteractionDetector:
         
         # Exceptional skills + reasonable salary
         if skills_score >= 85:
-            if candidate.expected_salary <= job.max_salary * 0.9:
+            if candidate.expected_salary <= job.salary_max * 0.9:
                 return True
         
         return False
@@ -251,7 +246,7 @@ class SmartWeightOptimizer:
         - Salary range
         """
         
-        title_lower = job.job_title.lower() if job.job_title else ""
+        title_lower = job.title.lower() if job.title else ""
         
         # Check for executive keywords
         executive_keywords = ['director', 'vp', 'vice president', 'chief', 'ceo', 'coo', 'cfo', 'head of']
