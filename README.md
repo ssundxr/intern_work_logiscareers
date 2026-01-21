@@ -92,7 +92,7 @@ The API will be available at `http://localhost:8000`
 │  ├─ Scoring Strategies: 6 modular assessment strategies     │
 │  ├─ Aggregators: Weighted score aggregation                 │
 │  ├─ Rules Engine: Hard rejection logic                      │
-│  └─ Schemas: Pydantic data models for type safety          │
+│  └─ Schemas: Pydantic data models for type safety           │
 ├─────────────────────────────────────────────────────────────┤
 │                      ML LAYER                               │
 │  ├─ CV Parser: Pipeline-based parsing system                │
@@ -270,7 +270,7 @@ comprehensive_scoring:
       github_profile_bonus: 5
 ```
 
-**⚠️ IMPORTANT**: Configuration is validated at application startup. Invalid or missing configuration will cause the service to **fail-fast** with a clear error message.
+**IMPORTANT**: Configuration is validated at application startup. Invalid or missing configuration will cause the service to **fail-fast** with a clear error message.
 
 ---
 
@@ -415,7 +415,7 @@ On 4-core server with 8GB RAM:
 **Solution**: Validate `config/thresholds.yaml` exists and is valid YAML
 
 ```bash
-python -c "from config.scoring_config import scoring_config; print('✅ Config valid')"
+python -c "from config.scoring_config import scoring_config; print('Config valid')"
 ```
 
 ### High Latency
