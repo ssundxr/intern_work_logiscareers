@@ -10,14 +10,14 @@
 
 ### Key Capabilities
 
-- 🎯 **Multi-Dimensional Scoring**: Evaluates candidates across 6 assessment dimensions (personal details, experience, education, skills, salary, CV quality)
-- 🧠 **ML-Powered CV Parsing**: Semantic section detection and entity extraction with NER pipeline
-- 🔍 **Semantic Skill Matching**: Embeddings-based skill matching with synonym and semantic similarity detection
-- 📊 **Confidence Metrics**: Reliability scoring for each evaluation with detailed performance metrics
-- ⚙️ **Contextual Adjustments**: Dynamic score adjustments based on job requirements and industry context
-- 🏢 **Industry-Specific Logic**: Specialized scoring rules for logistics, technology, finance, and healthcare sectors
-- 📈 **Feature Interaction Detection**: Identifies synergies between candidate attributes for comprehensive assessment
-- 🔐 **Production-Ready**: Structured error handling, JSON logging, comprehensive exception handling
+-  **Multi-Dimensional Scoring**: Evaluates candidates across 6 assessment dimensions (personal details, experience, education, skills, salary, CV quality)
+-  **ML-Powered CV Parsing**: Semantic section detection and entity extraction with NER pipeline
+-  **Semantic Skill Matching**: Embeddings-based skill matching with synonym and semantic similarity detection
+-  **Confidence Metrics**: Reliability scoring for each evaluation with detailed performance metrics
+-  **Contextual Adjustments**: Dynamic score adjustments based on job requirements and industry context
+-  **Industry-Specific Logic**: Specialized scoring rules for logistics, technology, finance, and healthcare sectors
+-  **Feature Interaction Detection**: Identifies synergies between candidate attributes for comprehensive assessment
+-  **Production-Ready**: Structured error handling, JSON logging, comprehensive exception handling
 
 ---
 
