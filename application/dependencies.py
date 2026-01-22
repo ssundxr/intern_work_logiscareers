@@ -14,10 +14,10 @@ from typing import Optional
 
 from fastapi import Header, HTTPException
 
-from logis_ai_candidate_engine.application.bootstrap import get_application
-from logis_ai_candidate_engine.application.evaluation_service import EvaluationService
-from logis_ai_candidate_engine.application.cv_service import CVService
-from logis_ai_candidate_engine.config import get_settings
+from application.bootstrap import get_application
+from application.evaluation_service import EvaluationService
+from application.cv_service import CVService
+from config import get_settings
 
 
 def get_evaluation_service() -> EvaluationService:

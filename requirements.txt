@@ -1,10 +1,13 @@
-fastapi
-uvicorn
-pydantic
-pyyaml
-numpy
-pytest
-requests
-httpx<0.28
-sentence-transformers
-torch
+# Production Dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.0.0
+pyyaml>=6.0
+numpy>=1.24.0
+requests>=2.31.0
+httpx>=0.27.0,<0.28
+
+# ML Dependencies
+sentence-transformers>=2.0.0
+torch>=2.0.0
+

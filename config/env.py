@@ -53,5 +53,37 @@ def load_env_file(env_file: Optional[str] = None) -> None:
                     os.environ[key] = value
 
 
+class EnvironmentConfig:
+    """
+    Typed access to environment configuration.
+    
+    Provides sensible defaults for all configuration values.
+    """
+    
+    @property
+    def environment(self) -> str:
+        """Application environment: development, staging, production."""
+        return os.getenv("ENVIRONMENT", "development")
+    
+    @property
+    def log_level(self) -> str:
+        """Logging level: DEBUG, INFO, WARNING, ERROR."""
+        return os.getenv("LOG_LEVEL", "INFO")
+    
+    @property
+    def debug(self) -> bool:
+        """Debug mode enabled."""
+        return os.getenv("DEBUG", "false").lower() in ("true", "1", "yes")
+
+
+# Singleton instance
+_env_config = EnvironmentConfig()
+
+
+def get_env() -> EnvironmentConfig:
+    """Get environment configuration singleton."""
+    return _env_config
+
+
 # Auto-load on import
 load_env_file()

@@ -9,8 +9,8 @@ implementation details to the API layer.
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from logis_ai_candidate_engine.ml.cv_parser import CVParser
-from logis_ai_candidate_engine.ml.cv_candidate_mapper import CVToCandidateMapper
+from ml.cv_parser import CVParser
+from ml.cv_candidate_mapper import CVToCandidateMapper
 
 
 class CVService:

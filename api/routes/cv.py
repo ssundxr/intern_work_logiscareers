@@ -8,11 +8,16 @@
 
 from typing import Dict, List, Optional, Any
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from logis_ai_candidate_engine.application.dependencies import get_cv_service
-from logis_ai_candidate_engine.application.cv_service import CVService
+from application.dependencies import get_cv_service
+from application.cv_service import CVService
+from application.exceptions import ParsingError, ValidationError
+from application.logging_config import get_logger
+
+
+logger = get_logger(__name__)
 
 
 # =============================================================================
@@ -154,13 +159,22 @@ def parse_cv_endpoint(
     2. Section detection using keyword and semantic matching
     3. Skill extraction using the Logis Career skill taxonomy
     """
+    logger.info(f"Parsing CV (length: {len(request.cv_text)} chars)")
+    
     try:
         result = service.parse_cv(request.cv_text)
+        logger.info(f"CV parsed successfully (confidence: {result.get('extraction_confidence', 0):.2f})")
         return ParsedCVResponse(**result)
+    
+    except ValueError as e:
+        # Validation/input errors
+        raise ValidationError(str(e), details={"cv_length": len(request.cv_text)})
+    
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"CV parsing failed: {str(e)}"
+        # Parsing failures
+        raise ParsingError(
+            f"Failed to parse CV: {str(e)}",
+            details={"cv_length": len(request.cv_text), "error_type": type(e).__name__}
         )
 
 
@@ -183,6 +197,8 @@ def parse_cv_to_candidate_endpoint(
     - Reduce manual data entry
     - Standardize candidate data extraction
     """
+    logger.info(f"Parsing CV to Candidate (candidate_id: {request.candidate_id})")
+    
     try:
         result = service.parse_cv_to_candidate(
             cv_text=request.cv_text,
@@ -195,11 +211,16 @@ def parse_cv_to_candidate_endpoint(
             visa_status=request.visa_status,
             gcc_experience_years=request.gcc_experience_years,
         )
+        logger.info(f"Candidate created from CV (confidence: {result.get('parsing_confidence', 0):.2f})")
         return CVToCandidateResponse(**result)
+    
+    except ValueError as e:
+        raise ValidationError(str(e), details={"candidate_id": request.candidate_id})
+    
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"CV to Candidate conversion failed: {str(e)}"
+        raise ParsingError(
+            f"Failed to convert CV to Candidate: {str(e)}",
+            details={"candidate_id": request.candidate_id, "error_type": type(e).__name__}
         )
 
 
@@ -220,13 +241,17 @@ def extract_skills_endpoint(
     including confidence scores and which CV section each skill
     was found in.
     """
+    logger.info(f"Extracting skills from CV (normalize: {request.normalize})")
+    
     try:
         result = service.extract_skills(request.cv_text, normalize=request.normalize)
+        logger.info(f"Extracted {result.get('total_skills_found', 0)} skills")
         return CVSkillsExtractionResponse(**result)
+    
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Skill extraction failed: {str(e)}"
+        raise ParsingError(
+            f"Failed to extract skills: {str(e)}",
+            details={"normalize": request.normalize, "error_type": type(e).__name__}
         )
 
 

@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 # Import our embedding model for semantic matching
-from logis_ai_candidate_engine.ml.embedding_model import EmbeddingModel
+from ml.embedding_model import EmbeddingModel
 
 
 # =============================================================================
@@ -838,6 +838,9 @@ class CVParser:
     Main CV parser class that orchestrates all extraction components.
     Provides a unified interface for parsing CVs from text or files.
     
+    REFACTORED: Now uses pipeline-based architecture (ml.parser.CVParsingPipeline)
+    instead of internal monolithic implementation.
+    
     Usage:
         parser = CVParser()
         result = parser.parse(cv_text)
@@ -849,14 +852,15 @@ class CVParser:
     """
     
     def __init__(self):
-        self.section_detector = SectionDetector()
-        self.skill_extractor = SkillExtractor()
-        self.experience_extractor = ExperienceExtractor()
-        self.education_extractor = EducationExtractor()
+        # Use the new pipeline-based implementation
+        from ml.parser import CVParsingPipeline
+        self._pipeline = CVParsingPipeline()
     
     def parse(self, text: str) -> ParsedCV:
         """
         Parse CV text and extract all structured information.
+        
+        REFACTORED: Delegates to CVParsingPipeline instead of inline implementation.
         
         Args:
             text: Raw CV text content
@@ -864,205 +868,14 @@ class CVParser:
         Returns:
             ParsedCV object containing all extracted information
         """
-        result = ParsedCV(raw_text=text)
-        
-        try:
-            # Step 1: Segment CV into sections
-            sections = self.section_detector.segment_cv(text)
-            
-            # Step 2: Extract contact information (from header section)
-            header_text = sections.get('header', text[:500])
-            result.contact = self._extract_contact(header_text)
-            
-            # Step 3: Extract name (from header section)
-            result.name = self._extract_name(header_text)
-            
-            # Step 4: Extract summary
-            if 'summary' in sections:
-                result.summary = sections['summary'][:500]  # Limit summary length
-            
-            # Step 5: Extract skills from all sections
-            all_skills = []
-            
-            # Prioritize skills section
-            if 'skills' in sections:
-                all_skills.extend(
-                    self.skill_extractor.extract_skills(sections['skills'], 'skills')
-                )
-            
-            # Also check experience and summary for skills
-            for section_name in ['experience', 'summary', 'header']:
-                if section_name in sections:
-                    section_skills = self.skill_extractor.extract_skills(
-                        sections[section_name], section_name
-                    )
-                    # Only add if not already found
-                    existing_normalized = {s.normalized_skill for s in all_skills}
-                    for skill in section_skills:
-                        if skill.normalized_skill not in existing_normalized:
-                            all_skills.append(skill)
-                            existing_normalized.add(skill.normalized_skill)
-            
-            result.skills = all_skills
-            
-            # Step 6: Extract experience
-            if 'experience' in sections:
-                result.experience = self.experience_extractor.extract_experiences(
-                    sections['experience']
-                )
-            
-            # Step 7: Extract education
-            if 'education' in sections:
-                result.education = self.education_extractor.extract_education(
-                    sections['education']
-                )
-            
-            # Step 8: Calculate total experience
-            result.total_experience_years = self._calculate_total_experience(
-                result.experience
-            )
-            
-            # Step 9: Extract languages
-            if 'languages' in sections:
-                result.languages = self._extract_languages(sections['languages'])
-            
-            # Step 10: Calculate extraction confidence
-            result.extraction_confidence = self._calculate_confidence(result)
-            
-        except Exception as e:
-            result.parsing_warnings.append(f"Parsing error: {str(e)}")
-            result.extraction_confidence = 0.0
-        
-        return result
-    
-    def _extract_contact(self, text: str) -> ContactInfo:
-        """Extract contact information from header section"""
-        contact = ContactInfo()
-        
-        # Extract email
-        emails = PatternMatcher.extract_emails(text)
-        if emails:
-            contact.email = emails[0]
-        
-        # Extract phone(s)
-        phones = PatternMatcher.extract_phones(text)
-        if phones:
-            contact.phone = phones[0]
-            if len(phones) > 1:
-                contact.alternative_phone = phones[1]
-        
-        # Extract LinkedIn
-        contact.linkedin_url = PatternMatcher.extract_linkedin(text)
-        
-        return contact
-    
-    def _extract_name(self, text: str) -> Optional[str]:
-        """Extract candidate name from header section"""
-        lines = text.split('\n')
-        
-        for line in lines[:5]:  # Check first 5 lines
-            stripped = line.strip()
-            
-            # Skip empty lines, emails, phones
-            if not stripped:
-                continue
-            if '@' in stripped:
-                continue
-            if re.match(r'^[\d\+\-\(\)\s]+$', stripped):
-                continue
-            
-            # Name is typically 2-4 words, title case
-            words = stripped.split()
-            if 2 <= len(words) <= 4:
-                # Check if it looks like a name (starts with capital, no numbers)
-                if all(w[0].isupper() for w in words if w) and not any(c.isdigit() for c in stripped):
-                    return stripped
-        
-        return None
-    
-    def _calculate_total_experience(
-        self, 
-        experiences: List[ParsedExperience]
-    ) -> Optional[float]:
-        """Calculate total years of experience"""
-        total_months = 0
-        
-        for exp in experiences:
-            if exp.duration_months:
-                total_months += exp.duration_months
-        
-        if total_months > 0:
-            return round(total_months / 12, 1)
-        
-        return None
-    
-    def _extract_languages(self, text: str) -> List[str]:
-        """Extract languages from languages section"""
-        languages = []
-        
-        # Common language names
-        known_languages = [
-            'english', 'arabic', 'hindi', 'urdu', 'french', 'spanish',
-            'german', 'mandarin', 'chinese', 'japanese', 'korean',
-            'portuguese', 'russian', 'italian', 'dutch', 'tamil',
-            'telugu', 'malayalam', 'bengali', 'punjabi', 'marathi',
-            'gujarati', 'kannada', 'tagalog', 'thai', 'vietnamese',
-        ]
-        
-        text_lower = text.lower()
-        
-        for lang in known_languages:
-            if lang in text_lower:
-                languages.append(lang.title())
-        
-        return languages
-    
-    def _calculate_confidence(self, result: ParsedCV) -> float:
-        """
-        Calculate overall extraction confidence score.
-        Based on how many fields were successfully extracted.
-        """
-        score = 0.0
-        max_score = 0.0
-        
-        # Name (important)
-        max_score += 15
-        if result.name:
-            score += 15
-        
-        # Contact (important)
-        max_score += 15
-        if result.contact.email:
-            score += 10
-        if result.contact.phone:
-            score += 5
-        
-        # Skills (very important)
-        max_score += 25
-        if result.skills:
-            score += min(25, len(result.skills) * 3)
-        
-        # Experience (very important)
-        max_score += 25
-        if result.experience:
-            score += min(25, len(result.experience) * 8)
-        
-        # Education
-        max_score += 15
-        if result.education:
-            score += min(15, len(result.education) * 8)
-        
-        # Summary
-        max_score += 5
-        if result.summary:
-            score += 5
-        
-        return round(min(score / max_score, 1.0), 2) if max_score > 0 else 0.0
+        return self._pipeline.parse(text)
     
     def parse_file(self, file_path: str) -> ParsedCV:
         """
         Parse CV from a file.
         Supports .txt files directly, .pdf and .docx require additional processing.
+        
+        REFACTORED: Delegates to CVParsingPipeline instead of inline implementation.
         
         Args:
             file_path: Path to CV file
@@ -1070,41 +883,7 @@ class CVParser:
         Returns:
             ParsedCV object
         """
-        path = Path(file_path)
-        
-        if not path.exists():
-            result = ParsedCV(raw_text="")
-            result.parsing_warnings.append(f"File not found: {file_path}")
-            return result
-        
-        ext = path.suffix.lower()
-        
-        if ext == '.txt':
-            with open(path, 'r', encoding='utf-8') as f:
-                text = f.read()
-            return self.parse(text)
-        
-        elif ext == '.pdf':
-            # PDF parsing would require PyPDF2 or pdfplumber
-            # For now, return error
-            result = ParsedCV(raw_text="")
-            result.parsing_warnings.append(
-                "PDF parsing not yet implemented. Please provide extracted text."
-            )
-            return result
-        
-        elif ext in ['.docx', '.doc']:
-            # DOCX parsing would require python-docx
-            result = ParsedCV(raw_text="")
-            result.parsing_warnings.append(
-                "DOCX parsing not yet implemented. Please provide extracted text."
-            )
-            return result
-        
-        else:
-            result = ParsedCV(raw_text="")
-            result.parsing_warnings.append(f"Unsupported file format: {ext}")
-            return result
+        return self._pipeline.parse_file(file_path)
 
 
 # =============================================================================

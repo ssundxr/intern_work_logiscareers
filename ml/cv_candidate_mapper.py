@@ -7,13 +7,13 @@
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
-from logis_ai_candidate_engine.ml.cv_parser import (
+from ml.cv_parser import (
     ParsedCV, 
     ParsedExperience, 
     ParsedEducation,
     SkillExtraction,
 )
-from logis_ai_candidate_engine.core.schemas.candidate import (
+from core.schemas.candidate import (
     Candidate,
     EmploymentHistory,
     EducationDetails,

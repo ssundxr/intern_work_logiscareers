@@ -10,9 +10,9 @@ from dataclasses import dataclass
 import yaml
 from pathlib import Path
 
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
-from logis_ai_candidate_engine.core.schemas.job import Job
-from logis_ai_candidate_engine.core.schemas.evaluation_response import ContextualAdjustment
+from core.schemas.candidate import Candidate
+from core.schemas.job import Job
+from core.schemas.evaluation_response import ContextualAdjustment
 
 
 @dataclass

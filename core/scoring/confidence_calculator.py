@@ -7,9 +7,9 @@
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
-from logis_ai_candidate_engine.core.schemas.job import Job
-from logis_ai_candidate_engine.core.schemas.evaluation_response import (
+from core.schemas.candidate import Candidate
+from core.schemas.job import Job
+from core.schemas.evaluation_response import (
     ConfidenceMetrics,
     ConfidenceLevel,
 )

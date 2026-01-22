@@ -5,7 +5,7 @@ from typing import Optional
 
 import numpy as np
 
-from logis_ai_candidate_engine.ml.embedding_model import EmbeddingModel
+from ml.embedding_model import EmbeddingModel
 
 
 @dataclass(frozen=True)

@@ -7,9 +7,9 @@
 from typing import Dict, List, Optional, Tuple
 from enum import Enum
 
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
-from logis_ai_candidate_engine.core.schemas.job import Job
-from logis_ai_candidate_engine.core.schemas.evaluation_response import FeatureInteraction
+from core.schemas.candidate import Candidate
+from core.schemas.job import Job
+from core.schemas.evaluation_response import FeatureInteraction
 
 
 class JobLevel(Enum):
