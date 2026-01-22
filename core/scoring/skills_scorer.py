@@ -15,7 +15,7 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 from sentence_transformers import SentenceTransformer
 
-from logis_ai_candidate_engine.ml.skill_matcher import get_skill_matcher, SkillMatchResult, SkillMatch
+from ml.skill_matcher import get_skill_matcher, SkillMatchResult, SkillMatch
 
 
 @dataclass

@@ -36,16 +36,20 @@ env/
 # Environment
 .env
 .env.local
+.env.*.local
 
 # Testing
+tests/
 .pytest_cache/
 .coverage
 htmlcov/
 *.ipynb_checkpoints/
+.tox/
 
 # OS
 .DS_Store
 Thumbs.db
+*.db
 
 # Logs
 *.log
@@ -56,3 +60,18 @@ logs/
 *.temp
 temp/
 tmp/
+
+# Sample/Development Data
+data/sample_*
+data/golden_*
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Documentation (development)
+TASK*.md
+REFACTORING*.md
+verify_*.py
+test_task*.py

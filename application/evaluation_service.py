@@ -5,15 +5,15 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-from logis_ai_candidate_engine.core.aggregation.weighted_score_aggregator import (
+from core.aggregation.weighted_score_aggregator import (
     WeightedScoreAggregator,
 )
-from logis_ai_candidate_engine.core.explainability.section_explanations import (
+from core.explainability.section_explanations import (
     SectionExplanationBuilder,
 )
-from logis_ai_candidate_engine.core.rules.hard_rejection_engine import HardRejectionEngine
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
-from logis_ai_candidate_engine.core.schemas.evaluation_response import (
+from core.rules.hard_rejection_engine import HardRejectionEngine
+from core.schemas.candidate import Candidate
+from core.schemas.evaluation_response import (
     ContextualAdjustment,
     EvaluationResponse,
     FeatureInteraction,
@@ -22,16 +22,16 @@ from logis_ai_candidate_engine.core.schemas.evaluation_response import (
     ScoringMetadata,
     SectionScore,
 )
-from logis_ai_candidate_engine.core.schemas.job import Job
-from logis_ai_candidate_engine.core.scoring.advanced_scorer import (
+from core.schemas.job import Job
+from core.scoring.advanced_scorer import (
     FeatureInteractionDetector,
     SmartWeightOptimizer,
 )
-from logis_ai_candidate_engine.core.scoring.confidence_calculator import ConfidenceCalculator
-from logis_ai_candidate_engine.core.scoring.contextual_adjuster import ContextualAdjuster
-from logis_ai_candidate_engine.core.scoring.experience_scorer import ExperienceScorer
-from logis_ai_candidate_engine.core.scoring.skills_scorer import SkillsScorer
-from logis_ai_candidate_engine.ml.semantic_similarity import SemanticSimilarityScorer
+from core.scoring.confidence_calculator import ConfidenceCalculator
+from core.scoring.contextual_adjuster import ContextualAdjuster
+from core.scoring.experience_scorer import ExperienceScorer
+from core.scoring.skills_scorer import SkillsScorer
+from ml.semantic_similarity import SemanticSimilarityScorer
 
 
 logger = logging.getLogger(__name__)

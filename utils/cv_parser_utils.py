@@ -7,9 +7,9 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 import uuid
 
-from logis_ai_candidate_engine.ml.cv_parser import CVParser, ParsedCV
-from logis_ai_candidate_engine.ml.cv_candidate_mapper import CVToCandidateMapper
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
+from ml.cv_parser import CVParser, ParsedCV
+from ml.cv_candidate_mapper import CVToCandidateMapper
+from core.schemas.candidate import Candidate
 
 
 

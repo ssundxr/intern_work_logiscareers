@@ -9,6 +9,7 @@ Responsibilities:
 - Construct dependency graph
 - Validate bootstrap completion
 - Provide service factories
+- VALIDATE SCORING CONFIGURATION (fail-fast if invalid)
 
 Layer: Application
 Dependencies: Core, ML (NO FastAPI)
@@ -19,11 +20,27 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from logis_ai_candidate_engine.application.cv_service import CVService
-from logis_ai_candidate_engine.application.evaluation_service import EvaluationService
+from application.cv_service import CVService
+from application.evaluation_service import EvaluationService
 
-
-logger = logging.getLogger(__name__)
+# CRITICAL: Import scoring configuration early to fail-fast if invalid
+# This ensures the application CANNOT start with missing/invalid configuration
+try:
+    from config.scoring_config import scoring_config, ConfigurationError
+    logger = logging.getLogger(__name__)
+    logger.info(f"✓ Scoring configuration validated successfully")
+    logger.info(f"  Section weights: personal={scoring_config.section_weights.personal_details}, "
+                f"experience={scoring_config.section_weights.experience}, "
+                f"education={scoring_config.section_weights.education}, "
+                f"skills={scoring_config.section_weights.skills}, "
+                f"salary={scoring_config.section_weights.salary}, "
+                f"cv_analysis={scoring_config.section_weights.cv_analysis}")
+except ConfigurationError as e:
+    logger = logging.getLogger(__name__)
+    logger.critical("❌ FATAL: Application cannot start - scoring configuration is invalid")
+    logger.critical(f"Error: {e}")
+    logger.critical("Fix config/thresholds.yaml and restart the application")
+    raise  # Re-raise to prevent application startup
 
 
 class ApplicationBootstrap:

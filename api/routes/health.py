@@ -14,8 +14,8 @@ from datetime import datetime
 
 from fastapi import APIRouter, Response, status
 
-from logis_ai_candidate_engine.application.bootstrap import get_application
-from logis_ai_candidate_engine.config import get_settings
+from application.bootstrap import get_application
+from config import get_settings
 
 
 router = APIRouter(tags=["Health"])

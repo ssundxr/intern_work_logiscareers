@@ -4,8 +4,8 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from logis_ai_candidate_engine.core.schemas.job import Job
-from logis_ai_candidate_engine.core.schemas.candidate import Candidate
+from core.schemas.job import Job
+from core.schemas.candidate import Candidate
 
 
 class HardRejectionResult:
