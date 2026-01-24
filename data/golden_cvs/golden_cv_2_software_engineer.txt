@@ -1,0 +1,44 @@
+Ahmed Hassan
+ahmed.hassan@techmail.com
++971 52 345 6789
+
+SUMMARY
+Full-stack software engineer with 5 years experience in web development.
+Passionate about building scalable applications using modern technologies.
+
+EXPERIENCE
+Senior Software Engineer
+TechCorp Solutions, Dubai
+Jun 2021 - Present
+- Developed microservices architecture using Python FastAPI and Docker
+- Built RESTful APIs serving 100K+ daily requests
+- Implemented CI/CD pipelines reducing deployment time by 40%
+- Mentored junior developers and conducted code reviews
+
+Software Engineer
+StartupHub, Abu Dhabi
+Jan 2019 - May 2021
+- Created web applications using React and Node.js
+- Integrated payment gateways and third-party APIs
+- Optimized database queries improving response time by 50%
+- Collaborated with product team on feature development
+
+Junior Developer
+WebSolutions LLC, Sharjah
+Jul 2018 - Dec 2018
+- Maintained existing web applications
+- Fixed bugs and implemented minor features
+- Learned agile development methodologies
+
+EDUCATION
+Bachelor of Computer Science
+Khalifa University
+Graduated: 2018
+
+TECHNICAL SKILLS
+Python, JavaScript, TypeScript, React, Node.js, FastAPI, Django,
+PostgreSQL, MongoDB, Redis, Docker, Kubernetes, Git, AWS, Azure,
+REST APIs, GraphQL, HTML, CSS, Jest, Pytest
+
+LANGUAGES
+Arabic (Native), English (Fluent)
