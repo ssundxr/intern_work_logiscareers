@@ -11,10 +11,10 @@ from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from application.dependencies import get_cv_service
+from api.dependencies import get_cv_service
 from application.cv_service import CVService
 from application.exceptions import ParsingError, ValidationError
-from application.logging_config import get_logger
+from config.logging_config import get_logger
 
 
 logger = get_logger(__name__)

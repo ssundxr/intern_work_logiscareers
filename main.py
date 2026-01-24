@@ -43,7 +43,7 @@ from application.exceptions import (
     ConfigurationError,
     ValidationError,
 )
-from application.logging_config import configure_logging, get_logger
+from config.logging_config import configure_logging, get_logger
 from config import get_settings
 
 
