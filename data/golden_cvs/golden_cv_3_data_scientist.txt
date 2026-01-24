@@ -1,0 +1,45 @@
+Maria Rodriguez
+maria.r@datamail.com | +971 56 789 1234
+
+PROFESSIONAL PROFILE
+Data Scientist with 6 years experience in machine learning and analytics.
+Expertise in building predictive models and deriving actionable insights from data.
+
+PROFESSIONAL EXPERIENCE
+Senior Data Scientist | AI Labs, Dubai | Mar 2021 - Present
+• Developed ML models for customer churn prediction (92% accuracy)
+• Built recommendation systems using collaborative filtering
+• Deployed models to production using MLflow and Docker
+• Led data science team of 4 members
+
+Data Scientist | Analytics Hub, Abu Dhabi | Jun 2019 - Feb 2021
+• Created forecasting models for inventory optimization
+• Performed A/B testing and statistical analysis
+• Built dashboards visualizing key business metrics
+• Collaborated with engineering team on data pipelines
+
+Data Analyst | Business Insights Co. | Jan 2018 - May 2019
+• Analyzed customer behavior data using SQL and Python
+• Created reports for management decision-making
+• Cleaned and preprocessed large datasets
+
+EDUCATION
+Master of Science in Data Science
+University of Wollongong Dubai, 2017
+
+Bachelor of Statistics
+Indian Institute of Technology, 2015
+
+TECHNICAL EXPERTISE
+Python, R, SQL, Machine Learning, Deep Learning, NLP, Computer Vision,
+TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn,
+Jupyter, Git, Docker, AWS SageMaker, Azure ML, Tableau, PowerBI,
+Statistics, A/B Testing, Hypothesis Testing
+
+CERTIFICATIONS
+- AWS Certified Machine Learning Specialty
+- Google Professional Data Engineer
+- Deep Learning Specialization (Coursera)
+
+LANGUAGES
+English, Spanish, Hindi
