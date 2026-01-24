@@ -25,8 +25,10 @@ from application.evaluation_service import EvaluationService
 
 # CRITICAL: Import scoring configuration early to fail-fast if invalid
 # This ensures the application CANNOT start with missing/invalid configuration
+from application.exceptions import ConfigurationError
+
 try:
-    from config.scoring_config import scoring_config, ConfigurationError
+    from config.scoring_config import scoring_config
     logger = logging.getLogger(__name__)
     logger.info(f"✓ Scoring configuration validated successfully")
     logger.info(f"  Section weights: personal={scoring_config.section_weights.personal_details}, "

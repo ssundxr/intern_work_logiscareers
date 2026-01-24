@@ -20,7 +20,7 @@ Usage:
     nat_scores = scoring_config.field_scoring['personal_details']['nationality']
 
 Layer: Config
-Dependencies: None (intentionally minimal)
+Dependencies: config.config_validator (Pydantic validation)
 """
 
 from __future__ import annotations
@@ -33,18 +33,11 @@ from typing import Any
 
 import yaml
 
+# Import Pydantic-validated config
+from config.config_validator import get_thresholds_config, ConfigurationError
+
 
 logger = logging.getLogger(__name__)
-
-
-class ConfigurationError(Exception):
-    """
-    Raised when scoring configuration is missing, invalid, or incomplete.
-    
-    This is a FATAL error that should abort application startup.
-    DO NOT catch this exception in production code.
-    """
-    pass
 
 
 @dataclass(frozen=True)

@@ -9,7 +9,7 @@ Date: January 24, 2026
 """
 
 import pytest
-from hypothesis import given, strategies as st, assume
+from hypothesis import given, strategies as st, assume, settings, HealthCheck
 from core.scoring.strategies.skills_strategy import SkillsScoringStrategy
 from core.scoring.strategies.experience_strategy import ExperienceScoringStrategy
 from core.scoring.strategies.base import ScoringContext
@@ -75,6 +75,7 @@ class TestScoringStrategyProperties:
     """Property-based tests ensuring scoring strategies never violate invariants"""
     
     @pytest.mark.property
+    @settings(suppress_health_check=[HealthCheck.too_slow])
     @given(context=scoring_context_strategy())
     def test_skills_score_always_in_valid_range(self, context):
         """Property: Skills scores must always be between 0 and 100"""
