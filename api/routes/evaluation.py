@@ -14,13 +14,13 @@ Layer: API
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from application.dependencies import (
+from api.dependencies import (
     get_evaluation_service,
     require_api_key,
 )
 from application.evaluation_service import EvaluationService
 from application.exceptions import ScoringError, ValidationError
-from application.logging_config import get_logger
+from config.logging_config import get_logger
 from core.schemas.candidate import Candidate
 from core.schemas.evaluation_response import EvaluationResponse
 from core.schemas.job import Job
