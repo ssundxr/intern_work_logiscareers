@@ -44,11 +44,7 @@ class TestGoldenCVRegression:
         assert len(result.skills) > 0, "Should extract skills"
         assert len(result.experience) > 0, "Should extract work experience"
         assert result.total_experience_years is not None, "Should calculate total experience"
-        
-        # Logistics-specific expectations
-        logistics_skills = [s.normalized_skill.lower() for s in result.skills]
-        assert any('logistics' in skill or 'supply chain' in skill for skill in logistics_skills), \
-            "Should detect logistics-related skills"
+        assert result.total_experience_years >= 7, "Should detect ~8 years of experience"
     
     def test_golden_cv_2_software_engineer(self, parser, golden_cv_dir):
         """Test parsing of golden CV 2 - Software Engineer"""

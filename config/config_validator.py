@@ -269,7 +269,7 @@ def get_thresholds_config() -> ThresholdsConfig:
 # Validate configuration at import time (fail-fast)
 try:
     CONFIG = get_thresholds_config()
-    print(f"✓ Configuration validated successfully: {_config_loader.thresholds_path}")
+    print(f"[OK] Configuration validated successfully: {_config_loader.thresholds_path}")
 except ConfigurationError as e:
     print(f"\n{'='*80}")
     print("CRITICAL: CONFIGURATION ERROR")
