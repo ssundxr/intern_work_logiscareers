@@ -90,10 +90,14 @@ class Job(BaseModel):
 
     # ---- Text Fields (ML Input) ----
     job_description: str = Field(
-        ..., description="Full job description text (roles and responsibilities)"
+        ..., 
+        description="Full job description text (roles and responsibilities). "
+                    "HTML tags (<p>, <span>, <ul>, <li>, etc.) are preserved and processed directly by NLP models "
+                    "without stripping. This field is used for semantic similarity scoring."
     )
     desired_candidate_profile: Optional[str] = Field(
-        None, description="Preferred candidate profile description"
+        None, 
+        description="Preferred candidate profile description. HTML formatting is supported."
     )
     recruiter_instructions: Optional[str] = Field(
         None, description="Internal instructions for recruiters (not published)"

@@ -158,6 +158,16 @@ class EvaluationResponse(BaseModel):
     adjusted_score: Optional[int] = Field(
         None, ge=0, le=100, description="Score after applying bonuses/penalties (same as total_score)"
     )
+    
+    @property
+    def overall_score(self) -> Optional[int]:
+        """Alias for total_score to support multiple API conventions."""
+        return self.total_score
+    
+    @property
+    def overall_match_score(self) -> Optional[int]:
+        """Another alias for total_score (0-100) for DRF compatibility."""
+        return self.total_score
 
     # ---- Rejection Handling ----
     is_rejected: bool = Field(default=False, description="Whether candidate was hard-rejected")
