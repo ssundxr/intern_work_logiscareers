@@ -1,5 +1,9 @@
 # Candidate schema definitions for ATS candidate profiles
 # core/schemas/candidate.py
+# 
+# DRF Backend Compatible - This schema is designed to be 1:1 compatible
+# with JSON exports from the DRF (Django REST Framework) backend.
+# All fields support the data types and formats provided by the ATS system.
 
 from pydantic import BaseModel, Field, HttpUrl
 from typing import List, Optional
@@ -103,13 +107,19 @@ class Candidate(BaseModel):
     )
 
     # ---- Employment History ----
-    employment_summary: Optional[str] = Field(None, description="Short professional summary")
+    employment_summary: Optional[str] = Field(
+        None, 
+        description="Short professional summary. HTML formatting from DRF is preserved for semantic analysis."
+    )
     employment_history: Optional[List[EmploymentHistory]] = Field(
         default_factory=list, description="Structured employment history"
     )
 
     # ---- Achievements & Portfolio ----
-    achievements: Optional[str] = Field(None, description="Major achievements and projects")
+    achievements: Optional[str] = Field(
+        None, 
+        description="Major achievements and projects. HTML tags are preserved."
+    )
     honors_awards: Optional[str] = Field(None, description="Honors and awards received")
 
     # ---- Preferences ----
@@ -124,7 +134,10 @@ class Candidate(BaseModel):
     linkedin_url: Optional[HttpUrl] = Field(None, description="LinkedIn profile URL")
 
     # ---- CV Content (ML Input) ----
-    cv_text: Optional[str] = Field(None, description="Extracted resume/CV text for semantic analysis")
+    cv_text: Optional[str] = Field(
+        None, 
+        description="Extracted resume/CV text for semantic analysis. HTML content from DRF is preserved and used directly by NLP models."
+    )
     cv_file_path: Optional[str] = Field(None, description="Path to original CV file (PDF/DOCX)")
 
     class Config:
