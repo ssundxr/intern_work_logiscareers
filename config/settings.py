@@ -23,7 +23,8 @@ class Settings:
     """
     
     # API Configuration
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None  # Legacy support
+    ai_engine_api_token: Optional[str] = None  # Bearer token for service-to-service auth
     
     # Application Metadata
     app_name: str = "Logis AI Candidate Engine"
@@ -50,6 +51,7 @@ class Settings:
         """
         return cls(
             api_key=os.getenv("API_KEY"),
+            ai_engine_api_token=os.getenv("AI_ENGINE_API_TOKEN"),
             app_name=os.getenv("APP_NAME", "Logis AI Candidate Engine"),
             app_version=os.getenv("APP_VERSION", "2.0.0"),
             app_phase=os.getenv("APP_PHASE", "4 - Advanced Hybrid Scoring"),
@@ -70,6 +72,10 @@ class Settings:
     def requires_api_key(self) -> bool:
         """Check if API key authentication is required."""
         return self.api_key is not None and len(self.api_key) > 0
+    
+    def requires_authentication(self) -> bool:
+        """Check if Bearer token authentication is required."""
+        return self.ai_engine_api_token is not None and len(self.ai_engine_api_token) > 0
 
 
 # Global settings instance

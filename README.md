@@ -188,35 +188,46 @@ Once the service is running, interactive API documentation is available:
 
 ### Core Endpoints
 
-#### Health Checks
+**Authentication:** All endpoints (except health checks) require Bearer token authentication.
+
+#### Health Checks (Public)
 ```
 GET /health         → Liveness probe (service running?)
 GET /ready          → Readiness probe (ready to serve?)
 ```
 
-#### Candidate Evaluation
+#### Candidate Evaluation (Protected)
 ```
 POST /api/v1/evaluate
+  Headers: Authorization: Bearer <token>
   Request: { candidate: CandidateInput, job: JobInput }
   Response: { score: 0-100, confidence: 0-1, recommendations: [...] }
+
+POST /api/v1/compare
+  Headers: Authorization: Bearer <token>
+  Request: { candidate: CandidateInput, job: JobInput }
+  Response: { overall_score: 0-100, section_scores: {...}, strengths: [...] }
 ```
 
-#### CV Parsing
+#### CV Parsing (Protected)
 ```
 POST /api/v1/cv/parse
+  Headers: Authorization: Bearer <token>
   Request: { cv_text: string }
   Response: { sections: {...}, entities: {...}, parsed_cv: {...} }
 
 POST /api/v1/cv/parse-to-candidate
+  Headers: Authorization: Bearer <token>
   Request: { cv_text: string }
   Response: { candidate: CandidateSchema }
 
 POST /api/v1/cv/extract-skills
+  Headers: Authorization: Bearer <token>
   Request: { cv_text: string }
   Response: { skills: [...], confidence_scores: [...] }
 ```
 
-See API docs (Swagger/ReDoc) for detailed request/response schemas.
+📚 **Full API documentation:** See [API.md](docs/API.md) and [AUTHENTICATION.md](docs/AUTHENTICATION.md) for detailed request/response schemas and authentication examples.
 
 ---
 
@@ -228,16 +239,17 @@ Create a `.env` file (template: `.env.example`):
 
 ```env
 # Server
-API_KEY=your-secret-key-here
 ENVIRONMENT=production
 LOG_LEVEL=INFO
 
-# Database (if applicable)
-DATABASE_URL=postgresql://user:password@localhost/db
+# Authentication (REQUIRED for production)
+AI_ENGINE_API_TOKEN=your-secure-token-here  # Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
 
 # ML Models
 EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 ```
+
+**⚠️ Security Note:** The `AI_ENGINE_API_TOKEN` is required for production deployments. All API endpoints (except `/health` and `/ready`) require Bearer token authentication. See [Authentication Guide](docs/AUTHENTICATION.md) for details.
 
 ### Scoring Configuration
 
@@ -285,7 +297,7 @@ docker build -t logis-ai-engine:latest .
 docker run -d \
   --name logis-ai-engine \
   -p 8000:8000 \
-  -e API_KEY=your-key \
+  -e AI_ENGINE_API_TOKEN=your-secure-token \
   -e ENVIRONMENT=production \
   --restart unless-stopped \
   logis-ai-engine:latest

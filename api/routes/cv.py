@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from api.dependencies import get_cv_service
+from api.dependencies import get_cv_service, verify_bearer_token
 from application.cv_service import CVService
 from application.exceptions import ParsingError, ValidationError
 from config.logging_config import get_logger
@@ -141,6 +141,7 @@ router = APIRouter(prefix="/cv", tags=["CV Parsing"])
 @router.post("/parse", response_model=ParsedCVResponse)
 def parse_cv_endpoint(
     request: ParseCVRequest,
+    _: None = Depends(verify_bearer_token),
     service: CVService = Depends(get_cv_service)
 ) -> ParsedCVResponse:
     """
@@ -158,6 +159,9 @@ def parse_cv_endpoint(
     1. Pattern matching for structured data (emails, phones, dates)
     2. Section detection using keyword and semantic matching
     3. Skill extraction using the Logis Career skill taxonomy
+    
+    Authentication:
+        Requires Bearer token in Authorization header.
     """
     logger.info(f"Parsing CV (length: {len(request.cv_text)} chars)")
     
@@ -181,6 +185,7 @@ def parse_cv_endpoint(
 @router.post("/parse-to-candidate", response_model=CVToCandidateResponse)
 def parse_cv_to_candidate_endpoint(
     request: CVToCandidateRequest,
+    _: None = Depends(verify_bearer_token),
     service: CVService = Depends(get_cv_service)
 ) -> CVToCandidateResponse:
     """
@@ -196,6 +201,9 @@ def parse_cv_to_candidate_endpoint(
     - Auto-populate candidate profiles from CVs
     - Reduce manual data entry
     - Standardize candidate data extraction
+    
+    Authentication:
+        Requires Bearer token in Authorization header.
     """
     logger.info(f"Parsing CV to Candidate (candidate_id: {request.candidate_id})")
     
@@ -227,6 +235,7 @@ def parse_cv_to_candidate_endpoint(
 @router.post("/extract-skills", response_model=CVSkillsExtractionResponse)
 def extract_skills_endpoint(
     request: CVSkillsExtractionRequest,
+    _: None = Depends(verify_bearer_token),
     service: CVService = Depends(get_cv_service)
 ) -> CVSkillsExtractionResponse:
     """
@@ -240,6 +249,9 @@ def extract_skills_endpoint(
     Returns both simple skill names and detailed extraction info
     including confidence scores and which CV section each skill
     was found in.
+    
+    Authentication:
+        Requires Bearer token in Authorization header.
     """
     logger.info(f"Extracting skills from CV (normalize: {request.normalize})")
     

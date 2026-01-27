@@ -16,7 +16,7 @@ from pydantic import BaseModel
 
 from api.dependencies import (
     get_evaluation_service,
-    require_api_key,
+    verify_bearer_token,
 )
 from application.evaluation_service import EvaluationService
 from application.exceptions import ScoringError, ValidationError
@@ -40,13 +40,16 @@ router = APIRouter(tags=["Evaluation"])
 @router.post("/evaluate", response_model=EvaluationResponse)
 def evaluate(
     payload: EvaluationRequest,
-    _: None = Depends(require_api_key),
+    _: None = Depends(verify_bearer_token),
     service: EvaluationService = Depends(get_evaluation_service),
 ) -> EvaluationResponse:
     """
     Evaluate a candidate against a job posting.
     
     Returns detailed scoring breakdown with confidence metrics.
+    
+    Authentication:
+        Requires Bearer token in Authorization header.
     """
     logger.info(
         f"Evaluating candidate {payload.candidate.id or 'unknown'} for job {payload.job.id or 'unknown'}"
@@ -87,7 +90,7 @@ def evaluate(
 @router.post("/compare", response_model=EvaluationResponse)
 def compare_candidate_to_job(
     payload: EvaluationRequest,
-    _: None = Depends(require_api_key),
+    _: None = Depends(verify_bearer_token),
     service: EvaluationService = Depends(get_evaluation_service),
 ) -> EvaluationResponse:
     """
@@ -97,6 +100,9 @@ def compare_candidate_to_job(
     - Skill Match: Weighted scores for required_skills vs preferred_skills
     - Experience Fit: Validates total years of experience and GCC-area tenure
     - Semantic Analysis: Uses sentence-transformers to compare career summary vs job description
+    
+    Authentication:
+        Requires Bearer token in Authorization header.
     
     Features:
     - Preserves HTML formatting in job_description field for NLP processing

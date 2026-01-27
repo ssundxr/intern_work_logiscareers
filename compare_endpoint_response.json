@@ -1,0 +1,258 @@
+{
+  "decision": "STRONG_MATCH",
+  "total_score": 100,
+  "base_score": 84,
+  "adjusted_score": 100,
+  "is_rejected": false,
+  "rejection_reason": null,
+  "rejection_rule_code": null,
+  "section_scores": {
+    "skills": {
+      "score": 78,
+      "weight": 0.2,
+      "contribution": 22.29,
+      "explanation": "Required skills: 5/5 matched (100%) | Preferred skills: 1/4 matched (25%) | Match types: 6 exact",
+      "details": {
+        "matched_skills": [
+          "Logistics Management",
+          "Supply Chain Management",
+          "3PL Operations",
+          "Warehouse Management",
+          "Inventory Control",
+          "SAP"
+        ],
+        "missing_skills": [
+          "Six Sigma",
+          "Lean Management",
+          "WMS Software"
+        ],
+        "matched_required": [
+          "Logistics Management",
+          "Supply Chain Management",
+          "3PL Operations",
+          "Warehouse Management",
+          "Inventory Control"
+        ],
+        "matched_preferred": [
+          "SAP"
+        ],
+        "missing_required": [],
+        "missing_preferred": [
+          "Six Sigma",
+          "Lean Management",
+          "WMS Software"
+        ],
+        "match_breakdown": {
+          "exact_matches": 6,
+          "synonym_matches": 0,
+          "semantic_matches": 0
+        },
+        "detailed_matches": {
+          "required_matches": [
+            {
+              "job_skill": "Logistics Management",
+              "candidate_skill": "Logistics Management",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: 'Logistics Management' exactly matches required 'Logistics Management'"
+            },
+            {
+              "job_skill": "Supply Chain Management",
+              "candidate_skill": "Supply Chain Management",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: 'Supply Chain Management' exactly matches required 'Supply Chain Management'"
+            },
+            {
+              "job_skill": "3PL Operations",
+              "candidate_skill": "3PL Operations",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: '3PL Operations' exactly matches required '3PL Operations'"
+            },
+            {
+              "job_skill": "Warehouse Management",
+              "candidate_skill": "Warehouse Management",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: 'Warehouse Management' exactly matches required 'Warehouse Management'"
+            },
+            {
+              "job_skill": "Inventory Control",
+              "candidate_skill": "Inventory Control",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: 'Inventory Control' exactly matches required 'Inventory Control'"
+            }
+          ],
+          "preferred_matches": [
+            {
+              "job_skill": "SAP",
+              "candidate_skill": "SAP",
+              "match_type": "exact",
+              "confidence": "100%",
+              "explanation": "Perfect match: 'SAP' exactly matches required 'SAP'"
+            }
+          ]
+        }
+      },
+      "confidence": null,
+      "data_completeness": null,
+      "signal_strength": null
+    },
+    "experience": {
+      "score": 85,
+      "weight": 0.25,
+      "contribution": 30.36,
+      "explanation": "9.5 years experience within required range (7\u201312 years)",
+      "details": {},
+      "confidence": null,
+      "data_completeness": null,
+      "signal_strength": null
+    },
+    "semantic": {
+      "score": 89,
+      "weight": 0.25,
+      "contribution": 31.79,
+      "explanation": "Semantic similarity score computed as 89/100",
+      "details": {},
+      "confidence": null,
+      "data_completeness": null,
+      "signal_strength": null
+    }
+  },
+  "explanations": {
+    "skills": "Required skills: 5/5 matched (100%) | Preferred skills: 1/4 matched (25%) | Match types: 6 exact (contributed 22 points)",
+    "experience": "9.5 years experience within required range (7\u201312 years) (contributed 30 points)",
+    "semantic": "Semantic similarity score computed as 89/100 (contributed 32 points)"
+  },
+  "matched_skills": [
+    "Logistics Management",
+    "Supply Chain Management",
+    "3PL Operations",
+    "Warehouse Management",
+    "Inventory Control",
+    "SAP"
+  ],
+  "missing_skills": [
+    "Six Sigma",
+    "Lean Management",
+    "WMS Software"
+  ],
+  "matched_required_skills": [
+    "Logistics Management",
+    "Supply Chain Management",
+    "3PL Operations",
+    "Warehouse Management",
+    "Inventory Control"
+  ],
+  "matched_preferred_skills": [
+    "SAP"
+  ],
+  "missing_required_skills": [],
+  "missing_preferred_skills": [
+    "Six Sigma",
+    "Lean Management",
+    "WMS Software"
+  ],
+  "skill_match_types": {
+    "exact": 6,
+    "synonym": 0,
+    "semantic": 0
+  },
+  "improvement_tips": [
+    {
+      "section": "skills",
+      "tip": "Consider adding these preferred skills: Six Sigma, Lean Management, WMS Software",
+      "priority": "high",
+      "potential_impact": null
+    }
+  ],
+  "quick_summary": "Strong: Strong required skills match (5/5, 6 exact), Bonus: 1 preferred skills matched",
+  "strengths": [
+    "Strong required skills match (5/5, 6 exact)",
+    "Bonus: 1 preferred skills matched",
+    "Excellent experience fit (9.5 years)",
+    "GCC experience (8.0 years)",
+    "High profile relevance"
+  ],
+  "concerns": [],
+  "confidence_metrics": {
+    "confidence_level": "very_high",
+    "confidence_score": 0.8732272730639281,
+    "uncertainty_factors": [
+      "incomplete_data (77% complete)",
+      "missing_job_min_salary",
+      "missing_job_max_salary"
+    ],
+    "data_completeness": 0.7777777777777778,
+    "signal_agreement": 0.8917604627223344
+  },
+  "contextual_adjustments": [
+    {
+      "rule_code": "PERFECT_SKILLS",
+      "rule_name": "Perfect Skill Match",
+      "adjustment_type": "bonus",
+      "impact": 5.0,
+      "reason": "Bonus when candidate matches 100% of required skills",
+      "confidence": 0.95
+    },
+    {
+      "rule_code": "GCC_EXP_MAJOR_BONUS",
+      "rule_name": "Extensive GCC Experience",
+      "adjustment_type": "bonus",
+      "impact": 8.0,
+      "reason": "Major bonus for candidates with 5+ years GCC experience",
+      "confidence": 0.95
+    },
+    {
+      "rule_code": "GCC_EXP_BONUS",
+      "rule_name": "GCC Experience Bonus",
+      "adjustment_type": "bonus",
+      "impact": 5.0,
+      "reason": "Bonus for candidates with GCC work experience (critical for UAE roles)",
+      "confidence": 0.95
+    }
+  ],
+  "feature_interactions": [],
+  "performance_metrics": {
+    "evaluation_time_ms": 123.71,
+    "rules_evaluated": 20,
+    "adjustments_applied": 3,
+    "interactions_detected": 0
+  },
+  "scoring_metadata": {
+    "weight_profile": "senior",
+    "weights_used": {
+      "skills": 0.2,
+      "experience": 0.25,
+      "semantic": 0.25,
+      "domain": 0.3
+    },
+    "base_score": 84,
+    "adjustment_delta": 16.0,
+    "confidence_level": "very_high",
+    "timestamp": "2026-01-26T12:24:03.803376"
+  },
+  "rule_trace": [
+    "HR-001:CHECKING_LOCATION_AND_VISA",
+    "HR-001:PASSED",
+    "HR-002:CHECKING_VISA_EXPIRY",
+    "HR-002:PASSED",
+    "HR-003:CHECKING_SALARY",
+    "HR-003:PASSED",
+    "HR-004:CHECKING_MIN_EXPERIENCE",
+    "HR-004:PASSED",
+    "HR-005:CHECKING_MAX_EXPERIENCE",
+    "HR-005:PASSED",
+    "HR-006:CHECKING_NATIONALITY",
+    "HR-006:PASSED",
+    "HR-007:CHECKING_EDUCATION",
+    "HR-007:PASSED",
+    "HR-008:CHECKING_GCC_EXPERIENCE",
+    "HR-008:PASSED",
+    "PASSED_ALL_HARD_RULES"
+  ],
+  "evaluated_at": "2026-01-26T12:24:03.803514",
+  "model_version": "2.0.0"
+}

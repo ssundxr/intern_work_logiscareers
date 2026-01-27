@@ -63,14 +63,59 @@ def create_app() -> FastAPI:
     # Get settings
     settings = get_settings()
 
-    # Create FastAPI app
+    # Create FastAPI app with security scheme for Swagger/OpenAPI
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
         description="Enterprise-grade AI-powered candidate ranking system for Logis Career. "
                     "Features: Advanced hybrid scoring, confidence metrics, contextual adjustments, "
-                    "and feature interaction detection.",
+                    "and feature interaction detection.\n\n"
+                    "**Authentication:** All endpoints require Bearer token authentication. "
+                    "Include the token in the Authorization header: `Authorization: Bearer <token>`",
+        swagger_ui_parameters={
+            "persistAuthorization": True,
+        },
     )
+    
+    # Add security scheme for Bearer token authentication
+    # This updates the OpenAPI schema for Swagger UI
+    from fastapi.openapi.utils import get_openapi
+    
+    def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
+        
+        openapi_schema = get_openapi(
+            title=settings.app_name,
+            version=settings.app_version,
+            description=app.description,
+            routes=app.routes,
+        )
+        
+        # Add Bearer token security scheme
+        openapi_schema["components"]["securitySchemes"] = {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter the API token provided by your administrator. "
+                              "The token should be set in the AI_ENGINE_API_TOKEN environment variable."
+            }
+        }
+        
+        # Apply security globally to all endpoints (except health)
+        if settings.requires_authentication():
+            for path in openapi_schema["paths"]:
+                # Don't require auth for health endpoints
+                if "/health" not in path and "/ready" not in path:
+                    for method in openapi_schema["paths"][path]:
+                        if method in ["get", "post", "put", "delete", "patch"]:
+                            openapi_schema["paths"][path][method]["security"] = [{"BearerAuth": []}]
+        
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
+    
+    app.openapi = custom_openapi
 
     # =============================================================================
     # EXCEPTION HANDLERS
